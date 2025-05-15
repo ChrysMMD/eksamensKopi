@@ -1,15 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-darkgreen: #5C5545;
+  --color-lightgreen: #939580;
+  --color-orange: #AE8035;
+  --color-rust: #bb7458;
+  --color-sand: #c4a380;
+  --color-offwhite: #efebe0;
+
+  --font-h1: 'CSBlessing', serif;
+  --font-body: 'Inter', sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@font-face {
+  font-family: 'CSBlessing';
+  src: url('/fonts/CSBlessing.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-h1 {
+  font-family: var(--font-h1);
+}
+
+.font-body {
+  font-family: var(--font-body);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +38,21 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+}
+
+/* Taget fra ChatGPT */
+@layer utilities {
+  .bg-rust        { background-color: var(--color-rust); }
+  .bg-darkgreen   { background-color: var(--color-darkgreen); }
+  .bg-lightgreen  { background-color: var(--color-lightgreen); }
+  .bg-orange      { background-color: var(--color-orange); }
+  .bg-sand        { background-color: var(--color-sand); }
+  .bg-offwhite    { background-color: var(--color-offwhite); }
+
+  .text-offwhite  { color: var(--color-offwhite); }
+  .text-foreground { color: var(--foreground); }
+
+  .font-h1        { font-family: var(--font-h1); }
+  .font-body      { font-family: var(--font-body); }
 }
