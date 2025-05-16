@@ -1,20 +1,9 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-//type beskrivelse til typescript
-type Data = {
-    id: number;
-  titles: string[];
-  artist_names: string[];
-  image: {
-    thumbnail: string;
-  };
-};
-
-
 export default function Datas(){
-    //gemmer vores liste når hentet
-    const [datas, setDatas] = useState<Data[]>([]);
+    //gemmer liste når hentes
+    const [datas, setDatas] = useState([]);
     //loading indikator
     const [loading, setLoading] = useState(true);
     //error-besked
@@ -25,7 +14,7 @@ export default function Datas(){
         axios.get("https://api.smk.dk/api/v1/art")
         //gemmer i datas og filtrere værker uden billeder væk
           .then((res) => {
-            const filtered = res.data.filter((item:Data) => item.image?.thumbnail);
+            const filtered = res.data.filter((item) => item.image?.thumbnail);
             setDatas(filtered);
             //loading stoppes, nu hvor dataen er hentet
             setLoading(false);
@@ -46,7 +35,7 @@ export default function Datas(){
         <div>
             <h1>Liste over værker:</h1>
             <ul>
-                {datas.map((data: Data) => (
+                {datas.map((data) => (
                      <li key={data.id} style={{ marginBottom: "1.5rem" }}>
                      <img
                        src={data.image?.thumbnail}
@@ -54,8 +43,8 @@ export default function Datas(){
                        width={200}
                        style={{ borderRadius: "8px" }}
                      />
-                     <p><strong>{data.titles[0] || "Ukendt titel"}</strong></p>
-                     <p>{data.artist_names[0] || "Ukendt kunstner"}</p>
+                     <p><strong>{data.titles?.[0] || "Ukendt titel"}</strong></p>
+                     <p>{data.artist_names?.[0] || "Ukendt kunstner"}</p>
                     </li>
                 ))}
             </ul>

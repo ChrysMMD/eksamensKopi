@@ -1,15 +1,6 @@
 "use client";
 import Link from "next/link";
 
-//Hvad komponenten tager imod af props
-type ButtonProps = {
-    children: React.ReactNode;
-    size?: 'sm' | 'md' | 'lg';
-    className?: string;
-    onClick?: () => void;
-    type?: 'button' | 'submit';
-};
-
 //Knap-størrelser med tailwind
 const sizeClasses = {
     sm: 'px-4 py-1 text-sm',
@@ -24,7 +15,7 @@ export default function Button({
     className = '',
     onClick,
     type = 'button',
-}: ButtonProps){
+}) {
     return (
         <button
         type={type}
