@@ -1,141 +1,90 @@
 "use client";
 
-import { useState } from "react";
+import { useUser } from "@clerk/nextjs";
+import { useState, useEffect } from "react";
+import Crud from "../components/Crud";
 import Button from "../components/Button";
 
 export default function DashboardPage() {
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    antal: "",
-    pris: "",
-    time: "",
-    category: "",
-    image: null,
-    isDraft: false,
-  });
+  const { user } = useUser(); //info om bruger
+  const [events, setEvents] = useState([]); //liste med events
+  const [editingId, setEditingId] = useState(null); //gem id hvis ændring
+  const [showCrudForm, setShowCrudForm] = useState(false); //vise formular eller ej
 
-  const [events, setEvents] = useState([]);
+  //tjek om der er gemt events i localstorage - hvis ja så hent
+  useEffect(() => {
+    const stored = localStorage.getItem("events");
+    if (stored) setEvents(JSON.parse(stored));
+  }, []);
 
-  const handleChange = (e) => {
-    const { name, value, type, checked, files } = e.target;
+  //kør når event ændres. Gemmer opdateret liste i localstorage
+  useEffect(() => {
+    localStorage.setItem("events", JSON.stringify(events));
+  }, [events]);
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox"
-        ? checked
-        : type === "file"
-        ? files[0]
-        : value,
-    }));
-  };
-
-  const handleAddEvent = () => {
-    if (!formData.title) return;
-
-    const newEvent = {
-      id: Date.now(),
-      ...formData,
-    };
-
-    setEvents((prev) => [newEvent, ...prev]);
-
-    // nulstil form
-    setFormData({
-      title: "",
-      description: "",
-      antal: "",
-      pris: "",
-      time: "",
-      category: "",
-      image: null,
-      isDraft: false,
-    });
-  };
-
-  const handleDeleteEvent = (id) => {
+  //slet event med det id, som der trykkes på
+  const handleDelete = (id) => {
     setEvents((prev) => prev.filter((e) => e.id !== id));
   };
 
-  return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Events</h1>
+  //rediger event med det id, som der trykkes på
+  const handleEdit = (event) => {
+    setEditingId(event.id);
+    setShowCrudForm(true);
+  };
 
-      <div className="mb-6 space-y-2">
-        <input
-          className="border rounded p-2 w-full"
-          name="title"
-          placeholder="Event titel"
-          value={formData.title}
-          onChange={handleChange}
-        />
-        <textarea
-          className="border rounded p-2 w-full"
-          name="description"
-          placeholder="Event beskrivelse"
-          value={formData.description}
-          onChange={handleChange}
-        />
-        <input
-          type="number"
-          className="border rounded p-2 w-full"
-          name="antal"
-          placeholder="Antal ledige pladser"
-          value={formData.antal}
-          onChange={handleChange}
-        />
-        <input
-          type="number"
-          className="border rounded p-2 w-full"
-          name="pris"
-          placeholder="Pris"
-          value={formData.pris}
-          onChange={handleChange}
-        />
-        <input
-          type="datetime-local"
-          className="border rounded p-2 w-full"
-          name="time"
-          value={formData.time}
-          onChange={handleChange}
-        />
-        <select
-          className="border rounded p-2 w-full"
-          name="category"
-          value={formData.category}
-          onChange={handleChange}
-        >
-          <option value="">Vælg kategori</option>
-          <option value="musik">Musik</option>
-          <option value="foredrag">Foredrag</option>
-          <option value="workshop">Workshop</option>
-        </select>
-        <input
-          type="file"
-          name="image"
-          className="w-full"
-          onChange={handleChange}
-        />
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            name="isDraft"
-            checked={formData.isDraft}
-            onChange={handleChange}
-          />
-          Gem som kladde
-        </label>
-        <Button size="lg" onClick={handleAddEvent}>
-          Tilføj event
-        </Button>
+  //opret nyt event med nyt id
+  const handleCreateNew = () => {
+    setEditingId(null);
+    setShowCrudForm(true);
+  };
+
+  //opdater eksisterende eller opret nyt event
+  const handleSave = (newEvent) => {
+    if (editingId) {
+      setEvents((prev) =>
+        prev.map((e) => (e.id === editingId ? { ...e, ...newEvent } : e))
+      );
+    } else {
+      setEvents((prev) => [
+        { id: Date.now(), ...newEvent },
+        ...prev,
+      ]);
+    }
+    setShowCrudForm(false);
+  };
+
+  return (
+    <div className="p-6 max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6 font-h1">
+        Velkommen {user?.firstName || "bruger"} 
+      </h1>
+
+      <div className="flex justify-between mb-6">
+        <Button onClick={handleCreateNew} type="submit" variant="secondary" size="lg">Opret nyt event</Button>
       </div>
 
+      {showCrudForm && (
+        <Crud
+          onSave={handleSave}
+          onCancel={() => setShowCrudForm(false)}
+          initialData={
+            editingId
+              ? events.find((e) => e.id === editingId)
+              : null
+          }
+        />
+      )}
+
+      <h2 className="text-2xl font-semibold mb-4">Eventoversigt</h2>
+
       <ul className="space-y-4">
+        {/* genneløber evens og viser titel, osv. */}
         {events.map((event) => (
           <li key={event.id} className="border p-4 rounded shadow-sm">
             <div className="flex justify-between items-start">
               <div>
-                <h2 className="font-semibold text-lg">{event.title}</h2>
+                <h3 className="text-xl font-semibold">{event.title}</h3>
                 <p>{event.description}</p>
                 <p className="text-sm text-gray-600">
                   {event.antal} pladser • {event.pris} kr • {event.time}
@@ -145,12 +94,20 @@ export default function DashboardPage() {
                   {event.isDraft ? "Kladde" : "Offentliggjort"}
                 </p>
               </div>
-              <button
-                className="text-red-500 hover:underline"
-                onClick={() => handleDeleteEvent(event.id)}
-              >
-                Slet
-              </button>
+              <div className="flex flex-col gap-2 items-end">
+                <button
+                  className="text-blue-500 hover:underline"
+                  onClick={() => handleEdit(event)}
+                >
+                  Rediger
+                </button>
+                <button
+                  className="text-red-500 hover:underline"
+                  onClick={() => handleDelete(event.id)}
+                >
+                  Slet
+                </button>
+              </div>
             </div>
           </li>
         ))}

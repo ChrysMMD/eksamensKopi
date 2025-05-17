@@ -56,7 +56,7 @@ export default function Home() {
         <h2 className="text-xl md:text-2xl font-light mb-8">Find spændende begivenheder nær dig</h2>
         
 <Link href="/events">
-  <Button size="lg">
+  <Button size="lg" variant="primary">
     Udforsk events
   </Button>
 </Link>
