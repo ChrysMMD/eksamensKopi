@@ -11,7 +11,7 @@ export default function Datas(){
 
     //hentning af data med axios
     useEffect(() => {
-        axios.get("https://api.smk.dk/api/v1/art")
+        axios.get("https://api.smk.dk/api/v1/art/all_ids")
         //gemmer i datas og filtrere værker uden billeder væk
           .then((res) => {
             const filtered = res.data.filter((item) => item.image?.thumbnail);

@@ -4,6 +4,7 @@ import { useUser } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 import Crud from "../components/Crud";
 import Button from "../components/Button";
+import Galleri from "../components/Galleri";
 
 export default function DashboardPage() {
   const { user } = useUser(); //info om bruger
@@ -55,13 +56,13 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6 font-h1">
+    <div className="p-6 max-w-4xl mx-auto flex flex-col justify-center items-center ">
+      <h1 className="text-4xl font-bold mb-10 mt-10 font-h1">
         Velkommen {user?.firstName || "bruger"} 
       </h1>
 
       <div className="flex justify-between mb-6">
-        <Button onClick={handleCreateNew} type="submit" variant="secondary" size="lg">Opret nyt event</Button>
+        <Button onClick={handleCreateNew} type="submit" variant="secondary" size="md">Opret nyt event</Button>
       </div>
 
       {showCrudForm && (
@@ -76,7 +77,7 @@ export default function DashboardPage() {
         />
       )}
 
-      <h2 className="text-2xl font-semibold mb-4">Eventoversigt</h2>
+      <h2 className="text-2xl self-start font-semibold mb-4">Eventoversigt</h2>
 
       <ul className="space-y-4">
         {/* genneløber evens og viser titel, osv. */}

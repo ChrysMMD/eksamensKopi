@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Button from "./Button";
+import axios from "axios";
+import Galleri from "./Galleri";
 
 export default function Crud({ onSave, onCancel, initialData }) {
     //gem inputfelterne. 
@@ -16,19 +18,26 @@ export default function Crud({ onSave, onCancel, initialData }) {
     isDraft: false,
   });
 
-  //hvis initialData er med så skal formulering til redigering
+
+  //hvis initialData er med så skal formularen til redigering
   useEffect(() => {
     if (initialData) {
       setFormData(initialData);
     }
   }, [initialData]);
 
+
   //funktion til at opdatere formData hvis input ændres alt efter inputtyperne
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : type === "file" ? files[0] : value,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : type === "file"
+          ? files[0]
+          : value,
     }));
   };
 
@@ -110,12 +119,9 @@ export default function Crud({ onSave, onCancel, initialData }) {
         <option value="foredrag">Foredrag</option>
         <option value="workshop">Workshop</option>
       </select>
-      <input
-        type="file"
-        name="image"
-        className="w-full"
-        onChange={handleChange}
-      />
+
+      <Galleri />
+
       <label className="flex items-center gap-2">
         <input
           type="checkbox"
@@ -127,13 +133,13 @@ export default function Crud({ onSave, onCancel, initialData }) {
       </label>
 
       <div className="flex gap-4 mt-4">
-        <Button type="submit" size="lg">
+        <Button type="submit" size="md" variant="secondary">
           {initialData ? "Gem ændringer" : "Opret event"}
         </Button>
         <button
           type="button"
           onClick={onCancel}
-          className="text-gray-600 hover:underline"
+          className="text-gray-600 cursor-pointer hover:underline"
         >
           Annuller
         </button>
