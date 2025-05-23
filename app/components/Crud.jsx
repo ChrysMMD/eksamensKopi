@@ -7,7 +7,7 @@ import Galleri from "./Galleri";
 import useImageStore from "../stores/useImageStore";
 
 export default function Crud({ onSave, onCancel, initialData }) {
-    //gem inputfelterne. 
+  //gem inputfelterne.
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -19,8 +19,7 @@ export default function Crud({ onSave, onCancel, initialData }) {
     isDraft: false,
   });
 
-   const selectedImages = useImageStore((state) => state.selectedImages);//state til valgte billeder
-
+  const selectedImages = useImageStore((state) => state.selectedImages); //state til valgte billeder
 
   //hvis initialData er med så skal formularen til redigering
   useEffect(() => {
@@ -29,18 +28,13 @@ export default function Crud({ onSave, onCancel, initialData }) {
     }
   }, [initialData]);
 
-
   //funktion til at opdatere formData hvis input ændres alt efter inputtyperne
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]:
-        type === "checkbox"
-          ? checked
-          : type === "file"
-          ? files[0]
-          : value,
+        type === "checkbox" ? checked : type === "file" ? files[0] : value,
     }));
   };
 
@@ -123,8 +117,7 @@ export default function Crud({ onSave, onCancel, initialData }) {
         <option value="workshop">Workshop</option>
       </select>
 
-
-    <Galleri />
+      <Galleri />
 
       <label className="flex items-center gap-2">
         <input
@@ -142,13 +135,17 @@ export default function Crud({ onSave, onCancel, initialData }) {
         </Button>
 
         <Button
-    type="button"
-    size="md"
-    variant={formData.isDraft ? "default" : "outline"}
-    onClick={() => handleChange({ target: { name: "isDraft", value: !formData.isDraft } })}
-  >
-    {formData.isDraft ? "Er kladde" : "Gem som kladde"}
-  </Button>
+          type="button"
+          size="md"
+          variant={formData.isDraft ? "default" : "outline"}
+          onClick={() =>
+            handleChange({
+              target: { name: "isDraft", value: !formData.isDraft },
+            })
+          }
+        >
+          {formData.isDraft ? "Er kladde" : "Gem som kladde"}
+        </Button>
 
         <button
           type="button"

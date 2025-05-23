@@ -1,27 +1,49 @@
-'use client';
+"use client";
+import { useEffect } from "react";
+import useEventStore from "../stores/useEventStore";
 
-import { useEffect, useState } from "react";
+export default function EventPage() {
+  const { events, setEvents } = useEventStore();
 
-export default function PublicEventsPage(){
-    const [events, setEvents] = useState([]);
+  useEffect(() => {
+    const stored = localStorage.getItem("events");
+    if (stored) setEvents(JSON.parse(stored));
+  }, []);
 
+  const publicEvents = events.filter((e) => !e.isDraft);
 
-return (
-    <main className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Offentlige Events</h1>
-      {events.length === 0 ? (
-        <p>Ingen events endnu 🕊️</p>
+  return (
+    <div className="p-6 max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6">Offentlige Events</h1>
+      {publicEvents.length === 0 ? (
+        <p>Ingen events er endnu offentliggjort.</p>
       ) : (
-        <ul className="space-y-4">
-          {events.map((event) => (
-            <li key={event.id} className="border p-4 rounded shadow">
-              <h2 className="text-xl font-semibold">{event.title}</h2>
-              <p>{event.description}</p>
-              <p className="text-sm text-gray-500">{event.date}</p>
-            </li>
-          ))}
-        </ul>
+        publicEvents.map((event) => (
+          <div key={event.id} className="mb-4 p-4 border rounded shadow">
+            <h2 className="text-xl font-semibold">{event.title}</h2>
+            <p>{event.description}</p>
+             <p className="text-sm text-gray-600">
+                  {event.antal} pladser • {event.pris} kr • {event.time}
+                </p>
+                <p className="text-sm italic text-gray-500">
+                  Kategori: {event.category} •{" "}
+                  {event.isDraft ? "Kladde" : "Offentliggjort"}
+                </p>
+                 {event.images && event.images.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {event.images.map((url, idx) => (
+                      <img
+                        key={idx}
+                        src={url}
+                        alt={`Event billede ${idx + 1}`}
+                        className="w-24 h-24 object-cover rounded"
+                      />
+                    ))}
+                  </div>
+                )}
+          </div>
+        ))
       )}
-    </main>
+    </div>
   );
 }

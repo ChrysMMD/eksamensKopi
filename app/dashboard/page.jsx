@@ -1,17 +1,20 @@
 "use client";
 
+import { redirect } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 import Crud from "../components/Crud";
 import Button from "../components/Button";
 import Galleri from "../components/Galleri";
 import useImageStore from "../stores/useImageStore";
+import useEventStore from "../stores/useEventStore";
 
 export default function DashboardPage() {
   const { user } = useUser(); //info om bruger
-  const [events, setEvents] = useState([]); //liste med events
+  const [events, setEvents, addEvent, updateEvent, deleteEvent] = useState([]); //liste med events
   const [editingId, setEditingId] = useState(null); //gem id hvis ændring
   const [showCrudForm, setShowCrudForm] = useState(false); //vise formular eller ej
+ 
 
   //tjek om der er gemt events i localstorage - hvis ja så hent
   useEffect(() => {
@@ -41,11 +44,7 @@ export default function DashboardPage() {
     setShowCrudForm(true);
   };
 
-  //opdater eksisterende eller opret nyt event
-const selectedImages = useImageStore((state) => state.selectedImages);
-const clearImages = useImageStore((state) => state.clearImages);
-
-const handleSave = (newEvent) => {
+  const handleSave = (newEvent) => {
   const fullEvent = { ...newEvent, images: selectedImages };
 
   if (editingId) {
@@ -62,6 +61,12 @@ const handleSave = (newEvent) => {
   setShowCrudForm(false);
   clearImages(); // nulstil billeder
 };
+
+  //opdater eksisterende eller opret nyt event
+const selectedImages = useImageStore((state) => state.selectedImages);
+const clearImages = useImageStore((state) => state.clearImages);
+
+
 
 
   return (
