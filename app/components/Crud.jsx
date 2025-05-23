@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Button from "./Button";
 import axios from "axios";
 import Galleri from "./Galleri";
+import useImageStore from "../stores/useImageStore";
 
 export default function Crud({ onSave, onCancel, initialData }) {
     //gem inputfelterne. 
@@ -17,6 +18,8 @@ export default function Crud({ onSave, onCancel, initialData }) {
     image: null,
     isDraft: false,
   });
+
+   const selectedImages = useImageStore((state) => state.selectedImages);//state til valgte billeder
 
 
   //hvis initialData er med så skal formularen til redigering
@@ -120,7 +123,8 @@ export default function Crud({ onSave, onCancel, initialData }) {
         <option value="workshop">Workshop</option>
       </select>
 
-      <Galleri />
+
+    <Galleri />
 
       <label className="flex items-center gap-2">
         <input
@@ -136,6 +140,16 @@ export default function Crud({ onSave, onCancel, initialData }) {
         <Button type="submit" size="md" variant="secondary">
           {initialData ? "Gem ændringer" : "Opret event"}
         </Button>
+
+        <Button
+    type="button"
+    size="md"
+    variant={formData.isDraft ? "default" : "outline"}
+    onClick={() => handleChange({ target: { name: "isDraft", value: !formData.isDraft } })}
+  >
+    {formData.isDraft ? "Er kladde" : "Gem som kladde"}
+  </Button>
+
         <button
           type="button"
           onClick={onCancel}

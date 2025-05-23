@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Crud from "../components/Crud";
 import Button from "../components/Button";
 import Galleri from "../components/Galleri";
+import useImageStore from "../stores/useImageStore";
 
 export default function DashboardPage() {
   const { user } = useUser(); //info om bruger
@@ -41,40 +42,55 @@ export default function DashboardPage() {
   };
 
   //opdater eksisterende eller opret nyt event
-  const handleSave = (newEvent) => {
-    if (editingId) {
-      setEvents((prev) =>
-        prev.map((e) => (e.id === editingId ? { ...e, ...newEvent } : e))
-      );
-    } else {
-      setEvents((prev) => [
-        { id: Date.now(), ...newEvent },
-        ...prev,
-      ]);
-    }
-    setShowCrudForm(false);
-  };
+const selectedImages = useImageStore((state) => state.selectedImages);
+const clearImages = useImageStore((state) => state.clearImages);
+
+const handleSave = (newEvent) => {
+  const fullEvent = { ...newEvent, images: selectedImages };
+
+  if (editingId) {
+    setEvents((prev) =>
+      prev.map((e) => (e.id === editingId ? { ...e, ...fullEvent } : e))
+    );
+  } else {
+    setEvents((prev) => [
+      { id: Date.now(), ...fullEvent },
+      ...prev,
+    ]);
+  }
+
+  setShowCrudForm(false);
+  clearImages(); // nulstil billeder
+};
+
 
   return (
     <div className="p-6 max-w-4xl mx-auto flex flex-col justify-center items-center ">
       <h1 className="text-4xl font-bold mb-10 mt-10 font-h1">
-        Velkommen {user?.firstName || "bruger"} 
+        Velkommen {user?.firstName || "bruger"}
       </h1>
 
       <div className="flex justify-between mb-6">
-        <Button onClick={handleCreateNew} type="submit" variant="secondary" size="md">Opret nyt event</Button>
+        <Button
+          onClick={handleCreateNew}
+          type="submit"
+          variant="secondary"
+          size="md"
+        >
+          Opret nyt event
+        </Button>
       </div>
 
       {showCrudForm && (
-        <Crud
-          onSave={handleSave}
-          onCancel={() => setShowCrudForm(false)}
-          initialData={
-            editingId
-              ? events.find((e) => e.id === editingId)
-              : null
-          }
-        />
+        <>
+          <Crud
+            onSave={handleSave}
+            onCancel={() => setShowCrudForm(false)}
+            initialData={
+              editingId ? events.find((e) => e.id === editingId) : null
+            }
+          />
+        </>
       )}
 
       <h2 className="text-2xl self-start font-semibold mb-4">Eventoversigt</h2>
@@ -94,6 +110,18 @@ export default function DashboardPage() {
                   Kategori: {event.category} •{" "}
                   {event.isDraft ? "Kladde" : "Offentliggjort"}
                 </p>
+                {event.images && event.images.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {event.images.map((url, idx) => (
+                      <img
+                        key={idx}
+                        src={url}
+                        alt={`Event billede ${idx + 1}`}
+                        className="w-24 h-24 object-cover rounded"
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="flex flex-col gap-2 items-end">
                 <button
