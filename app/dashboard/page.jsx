@@ -8,6 +8,7 @@ import Button from "../components/Button";
 import Galleri from "../components/Galleri";
 import useImageStore from "../stores/useImageStore";
 import useEventStore from "../stores/useEventStore";
+import EventList from "../components/EventList";
 
 export default function DashboardPage() {
   const { user } = useUser(); //info om bruger
@@ -98,54 +99,53 @@ const clearImages = useImageStore((state) => state.clearImages);
         </>
       )}
 
-      <h2 className="text-2xl self-start font-semibold mb-4">Eventoversigt</h2>
-
-      <ul className="space-y-4">
-        {/* genneløber evens og viser titel, osv. */}
-        {events.map((event) => (
-          <li key={event.id} className="border p-4 rounded shadow-sm">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-xl font-semibold">{event.title}</h3>
-                <p>{event.description}</p>
-                <p className="text-sm text-gray-600">
-                  {event.antal} pladser • {event.pris} kr • {event.time}
-                </p>
-                <p className="text-sm italic text-gray-500">
-                  Kategori: {event.category} •{" "}
-                  {event.isDraft ? "Kladde" : "Offentliggjort"}
-                </p>
-                {event.images && event.images.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {event.images.map((url, idx) => (
-                      <img
-                        key={idx}
-                        src={url}
-                        alt={`Event billede ${idx + 1}`}
-                        className="w-24 h-24 object-cover rounded"
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-              <div className="flex flex-col gap-2 items-end">
-                <button
-                  className="text-blue-500 hover:underline"
-                  onClick={() => handleEdit(event)}
-                >
-                  Rediger
-                </button>
-                <button
-                  className="text-red-500 hover:underline"
-                  onClick={() => handleDelete(event.id)}
-                >
-                  Slet
-                </button>
-              </div>
+     <EventCard
+  events={events}
+  title="Eventoversigt"
+  titleClassName="text-2xl font-semibold mb-4"
+  renderEvent={(event) => (
+    <div className="border p-4 rounded shadow-sm">
+      <div className="flex justify-between items-start">
+        <div>
+          <h3 className="text-xl font-semibold">{event.title}</h3>
+          <p>{event.description}</p>
+          <p className="text-sm text-gray-600">
+            {event.antal} pladser • {event.pris} kr • {event.time}
+          </p>
+          <p className="text-sm italic text-gray-500">
+            Kategori: {event.category} • {event.isDraft ? "Kladde" : "Offentliggjort"}
+          </p>
+          {event.images?.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {event.images.map((url, idx) => (
+                <img
+                  key={idx}
+                  src={url}
+                  alt={`Event billede ${idx + 1}`}
+                  className="w-24 h-24 object-cover rounded"
+                />
+              ))}
             </div>
-          </li>
-        ))}
-      </ul>
+          )}
+        </div>
+        <div className="flex flex-col gap-2 items-end">
+          <button
+            className="text-blue-500 hover:underline"
+            onClick={() => handleEdit(event)}
+          >
+            Rediger
+          </button>
+          <button
+            className="text-red-500 hover:underline"
+            onClick={() => handleDelete(event.id)}
+          >
+            Slet
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
+/>
     </div>
   );
 }
