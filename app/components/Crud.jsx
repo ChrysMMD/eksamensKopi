@@ -2,64 +2,91 @@
 
 import { useState, useEffect } from "react";
 import Button from "./Button";
-import axios from "axios";
 import Galleri from "./Galleri";
 import useImageStore from "../stores/useImageStore";
+import axios from "axios";
 
 export default function Crud({ onSave, onCancel, initialData }) {
-  //gem inputfelterne.
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    antal: "",
-    pris: "",
-    time: "",
-    category: "",
-    image: null,
+    totalTickets: "",
+    price: "",
+    date: "",
     isDraft: false,
+    locationId: "",
   });
 
-  const selectedImages = useImageStore((state) => state.selectedImages); //state til valgte billeder
+  const [locations, setLocations] = useState([]);
+  const selectedImages = useImageStore((state) => state.selectedImages);
+  const [validDates, setValidDates] = useState([]);
 
-  //hvis initialData er med så skal formularen til redigering
+  // Hent datoer
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/dates")
+      .then((res) => setValidDates(res.data))
+      .catch((err) => console.error("Kunne ikke hente datoer:", err));
+  }, []);
+
+  // Hent lokationer
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/locations")
+      .then((res) => setLocations(res.data))
+      .catch((err) => console.error("Kunne ikke hente lokationer", err));
+  }, []);
+
+  // Hvis redigering, udfyld felter
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
+      const { location, ...rest } = initialData;
+
+      setFormData((prev) => ({
+        ...prev,
+        ...rest,
+        totalTickets: rest.totalTickets?.toString() || "",
+        price: rest.price?.toString() || "",
+        date: rest.date || "",
+        locationId: rest.locationId || "",
+      }));
     }
   }, [initialData]);
 
-  //funktion til at opdatere formData hvis input ændres alt efter inputtyperne
+  // Input ændringer
   const handleChange = (e) => {
-    const { name, value, type, checked, files } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]:
-        type === "checkbox" ? checked : type === "file" ? files[0] : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  //kaldes når knappen trykkes. Data videre til dashboardPage gennem onSave. Zustand?
+  // Gem event
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.title) return;
-    onSave(formData); //giver data tilbage til DashboardPage
-    //formularen nulstilles kun hvis vi opretter nyt
-    if (!initialData) {
-      setFormData({
-        title: "",
-        description: "",
-        antal: "",
-        pris: "",
-        time: "",
-        category: "",
-        image: null,
-        isDraft: false,
-      });
-    }
+    if (!formData.title || !formData.locationId) return;
+
+    const selectedLocation = locations.find(
+      (loc) => loc.id === formData.locationId
+    );
+    const onlyDate = formData.date.split("T")[0];
+
+    onSave({
+      ...formData,
+      date: onlyDate,
+      totalTickets: Number(formData.totalTickets),
+      price: Number(formData.price),
+      artworkIds: selectedImages
+        .map((url) => {
+          const match = url.match(/_(kks[^.]+)\./i);
+          return match ? match[1].toLowerCase() : null;
+        })
+        .filter(Boolean),
+    });
   };
 
   return (
-    /* inputfelter bundet til formData */
     <form
       onSubmit={handleSubmit}
       className="border p-6 rounded bg-gray-50 mb-8 space-y-4"
@@ -85,36 +112,47 @@ export default function Crud({ onSave, onCancel, initialData }) {
       <input
         type="number"
         className="border rounded p-2 w-full"
-        name="antal"
+        name="totalTickets"
         placeholder="Antal ledige pladser"
-        value={formData.antal}
+        value={formData.totalTickets}
         onChange={handleChange}
       />
       <input
         type="number"
         className="border rounded p-2 w-full"
-        name="pris"
+        name="price"
         placeholder="Pris"
-        value={formData.pris}
-        onChange={handleChange}
-      />
-      <input
-        type="datetime-local"
-        className="border rounded p-2 w-full"
-        name="time"
-        value={formData.time}
+        value={formData.price}
         onChange={handleChange}
       />
       <select
         className="border rounded p-2 w-full"
-        name="category"
-        value={formData.category}
+        name="date"
+        value={formData.date}
         onChange={handleChange}
+        required
       >
-        <option value="">Vælg kategori</option>
-        <option value="musik">Musik</option>
-        <option value="foredrag">Foredrag</option>
-        <option value="workshop">Workshop</option>
+        <option value="">Vælg dato</option>
+        {validDates.map((date) => (
+          <option key={date} value={date}>
+            {date}
+          </option>
+        ))}
+      </select>
+
+      <select
+        className="border rounded p-2 w-full"
+        name="locationId"
+        value={formData.locationId}
+        onChange={handleChange}
+        required
+      >
+        <option value="">Vælg lokation</option>
+        {locations.map((loc) => (
+          <option key={loc.id} value={loc.id}>
+            {loc.name} – {loc.address} ({loc.maxGuests} pladser)
+          </option>
+        ))}
       </select>
 
       <Galleri />
@@ -133,20 +171,6 @@ export default function Crud({ onSave, onCancel, initialData }) {
         <Button type="submit" size="md" variant="secondary">
           {initialData ? "Gem ændringer" : "Opret event"}
         </Button>
-
-        <Button
-          type="button"
-          size="md"
-          variant={formData.isDraft ? "default" : "outline"}
-          onClick={() =>
-            handleChange({
-              target: { name: "isDraft", value: !formData.isDraft },
-            })
-          }
-        >
-          {formData.isDraft ? "Er kladde" : "Gem som kladde"}
-        </Button>
-
         <button
           type="button"
           onClick={onCancel}

@@ -1,151 +1,112 @@
 "use client";
 
-import { redirect } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 import Crud from "../components/Crud";
 import Button from "../components/Button";
-import Galleri from "../components/Galleri";
-import useImageStore from "../stores/useImageStore";
-import useEventStore from "../stores/useEventStore";
 import EventList from "../components/EventList";
+import api from "../lib/api/api";
+import DashboardCard from "../components/DashboardCard";
 
 export default function DashboardPage() {
-  const { user } = useUser(); //info om bruger
-  const [events, setEvents, addEvent, updateEvent, deleteEvent] = useState([]); //liste med events
-  const [editingId, setEditingId] = useState(null); //gem id hvis ændring
-  const [showCrudForm, setShowCrudForm] = useState(false); //vise formular eller ej
- 
+  const { user } = useUser();
+  const [events, setEvents] = useState([]);
+  const [showCrudForm, setShowCrudForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
 
-  //tjek om der er gemt events i localstorage - hvis ja så hent
+  //hentning af events fra backend
   useEffect(() => {
-    const stored = localStorage.getItem("events");
-    if (stored) setEvents(JSON.parse(stored));
+    const fetchEvents = async () => {
+      try {
+        const res = await api.get("/events");
+        setEvents(res.data);
+      } catch (err) {
+        console.error("Kunne ikke hente events:", err);
+      }
+    };
+
+    fetchEvents();
   }, []);
 
-  //kør når event ændres. Gemmer opdateret liste i localstorage
-  useEffect(() => {
-    localStorage.setItem("events", JSON.stringify(events));
-  }, [events]);
-
-  //slet event med det id, som der trykkes på
-  const handleDelete = (id) => {
-    setEvents((prev) => prev.filter((e) => e.id !== id));
-  };
-
-  //rediger event med det id, som der trykkes på
+  //redigering
   const handleEdit = (event) => {
     setEditingId(event.id);
     setShowCrudForm(true);
   };
 
-  //opret nyt event med nyt id
-  const handleCreateNew = () => {
-    setEditingId(null);
-    setShowCrudForm(true);
+  //gem
+  const handleSave = async (formData) => {
+    const eventToSend = {
+    ...formData,
+    curator: user?.firstName || "Ukendt", 
+  };
+    console.log("🔍 Data der sendes til serveren:", eventToSend);
+
+    try {
+      let response;
+
+      if (editingId) {
+        response = await api.patch(`/events/${editingId}`, eventToSend);
+        setEvents((prev) =>
+          prev.map((event) => (event.id === editingId ? response.data : event))
+        );
+      } else {
+        response = await api.post("/events", eventToSend);
+        setEvents((prev) => [response.data, ...prev]);
+      }
+
+      setShowCrudForm(false);
+      setEditingId(null);
+    } catch (err) {
+      console.error("Kunne ikke gemme event:", err);
+      alert("Noget gik galt. Se konsollen.");
+    }
   };
 
-  const handleSave = (newEvent) => {
-  const fullEvent = { ...newEvent, images: selectedImages };
-
-  if (editingId) {
-    setEvents((prev) =>
-      prev.map((e) => (e.id === editingId ? { ...e, ...fullEvent } : e))
-    );
-  } else {
-    setEvents((prev) => [
-      { id: Date.now(), ...fullEvent },
-      ...prev,
-    ]);
-  }
-
-  setShowCrudForm(false);
-  clearImages(); // nulstil billeder
-};
-
-  //opdater eksisterende eller opret nyt event
-const selectedImages = useImageStore((state) => state.selectedImages);
-const clearImages = useImageStore((state) => state.clearImages);
-
-
-
+  //sletning
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/events/${id}`);
+      setEvents((prev) => prev.filter((event) => event.id !== id));
+    } catch (err) {
+      console.error("Fejl ved sletning:", err);
+      alert("Noget gik galt ved sletning. Se konsollen.");
+    }
+  };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto flex flex-col justify-center items-center ">
-      <h1 className="text-4xl font-bold mb-10 mt-10 font-h1">
+    <div className="p-6 max-w-4xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6">
         Velkommen {user?.firstName || "bruger"}
       </h1>
 
-      <div className="flex justify-between mb-6">
-        <Button
-          onClick={handleCreateNew}
-          type="submit"
-          variant="secondary"
-          size="md"
-        >
-          Opret nyt event
-        </Button>
-      </div>
+      <Button onClick={() => setShowCrudForm(!showCrudForm)}>
+        {showCrudForm ? "Luk formular" : "Opret nyt event"}
+      </Button>
 
       {showCrudForm && (
-        <>
-          <Crud
-            onSave={handleSave}
-            onCancel={() => setShowCrudForm(false)}
-            initialData={
-              editingId ? events.find((e) => e.id === editingId) : null
-            }
-          />
-        </>
+        <Crud
+          initialData={events.find((e) => e.id === editingId)}
+          onSave={handleSave}
+          onCancel={() => {
+            setShowCrudForm(false);
+            setEditingId(null);
+          }}
+        />
       )}
 
-     <EventCard
-  events={events}
-  title="Eventoversigt"
-  titleClassName="text-2xl font-semibold mb-4"
-  renderEvent={(event) => (
-    <div className="border p-4 rounded shadow-sm">
-      <div className="flex justify-between items-start">
-        <div>
-          <h3 className="text-xl font-semibold">{event.title}</h3>
-          <p>{event.description}</p>
-          <p className="text-sm text-gray-600">
-            {event.antal} pladser • {event.pris} kr • {event.time}
-          </p>
-          <p className="text-sm italic text-gray-500">
-            Kategori: {event.category} • {event.isDraft ? "Kladde" : "Offentliggjort"}
-          </p>
-          {event.images?.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
-              {event.images.map((url, idx) => (
-                <img
-                  key={idx}
-                  src={url}
-                  alt={`Event billede ${idx + 1}`}
-                  className="w-24 h-24 object-cover rounded"
-                />
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="flex flex-col gap-2 items-end">
-          <button
-            className="text-blue-500 hover:underline"
-            onClick={() => handleEdit(event)}
-          >
-            Rediger
-          </button>
-          <button
-            className="text-red-500 hover:underline"
-            onClick={() => handleDelete(event.id)}
-          >
-            Slet
-          </button>
-        </div>
-      </div>
-    </div>
-  )}
-/>
+      <EventList
+        events={events}
+        title="Eventoversigt"
+        titleClassName="text-2xl font-semibold mb-4"
+        renderEvent={(event) => (
+          <DashboardCard
+            event={event}
+            onEdit={() => handleEdit(event)}
+            onDelete={handleDelete}
+          />
+        )}
+      />
     </div>
   );
 }

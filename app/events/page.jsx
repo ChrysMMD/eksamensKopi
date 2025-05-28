@@ -3,28 +3,41 @@ import { useEffect } from "react";
 import useEventStore from "../stores/useEventStore";
 import Button from "../components/Button";
 import EventList from "../components/EventList";
+import axios from "axios";
+
+const api = axios.create({
+  baseURL: "http://localhost:8080", // skift ved deploy
+});
 
 export default function EventPage() {
   const { events, setEvents } = useEventStore();
 
+
   useEffect(() => {
-    const stored = localStorage.getItem("events");
-    if (stored) setEvents(JSON.parse(stored));
+    const fetchEvents = async () => {
+      try {
+        const res = await api.get("/events");
+        setEvents(res.data);
+      } catch (err) {
+        console.error("🚨 Kunne ikke hente events", err);
+      }
+    };
+
+    fetchEvents();
   }, []);
-
-  const publicEvents = events.filter((e) => !e.isDraft);
-
   return (
     <div>
     <h1 className="font-h1 text-4xl mb-3">Kommende arangementer</h1>
+  
     <EventList
   events={events}
+  className="flex gap-4"
   renderEvent={(event) => (
-    <div className="bg-purple-100 rounded shadow w-full h-72 overflow-hidden">
-       {event.images?.length > 0 && (
+    <div className="w-64">
+       {event.artworkIds?.length > 0 && (
         <div>
            <img
-          src={event.images[0]}
+          src={`https://iip-thumb.smk.dk/iiif/jp2/${event.artworkIds[0].toLowerCase()}.tif.jp2/full/!400,/0/default.jpg`}
           alt=""
           className="w-full h-40 object-cover"
         />
@@ -35,13 +48,12 @@ export default function EventPage() {
       <div className="p-2 flex flex-col justify-between h-[calc(100%-10rem)]">
         <div>
       <h3 className="text-lg font-bold text-purple-800">{event.title}</h3>
-      <p>{event.category}</p>
       </div>
 
-      <div>
-        <p>Tidspunkt:{event.time}</p>
-        <p>Pladser: {event.antal}</p>
-    </div>
+      <p className="text-sm text-gray-600">
+            📅 {event.date} • 🎫 {event.totalTickets} pladser
+            {event.pris && <> • 💸 {event.pris} kr</>}
+          </p>
 
     </div>
     </div>

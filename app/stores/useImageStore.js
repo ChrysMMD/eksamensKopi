@@ -1,17 +1,29 @@
-import { create } from 'zustand';
+import { create } from "zustand";
+
 
 const useImageStore = create((set) => ({
   selectedImages: [],
-  setSelectedImages: (images) => set({ selectedImages: images }),
-  addImage: (image) =>
+  artworkIds: [],
+
+  addImage: (url) =>
     set((state) => ({
-      selectedImages: [...state.selectedImages, image],
+      selectedImages: [...state.selectedImages, url],
     })),
-  removeImage: (image) =>
+  removeImage: (url) =>
     set((state) => ({
-      selectedImages: state.selectedImages.filter((img) => img !== image),
+      selectedImages: state.selectedImages.filter((img) => img !== url),
     })),
-  clearImages: () => set({ selectedImages: [] }),
+
+  addArtworkId: (id) =>
+    set((state) => ({
+      artworkIds: [...state.artworkIds, id],
+    })),
+  removeArtworkId: (id) =>
+    set((state) => ({
+      artworkIds: state.artworkIds.filter((artId) => artId !== id),
+    })),
+
+  clearImages: () => set({ selectedImages: [], artworkIds: [] }),
 }));
 
 export default useImageStore;

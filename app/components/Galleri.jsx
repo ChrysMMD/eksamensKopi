@@ -9,11 +9,12 @@ export default function Galleri() {
   const [datas, setDatas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-   const selectedImages = useImageStore((state) => state.selectedImages);
+  const selectedImages = useImageStore((state) => state.selectedImages);
   const addImage = useImageStore((state) => state.addImage);
   const removeImage = useImageStore((state) => state.removeImage);
-
-
+  const artworkIds = useImageStore((state) => state.artworkIds);
+  const addArtworkId = useImageStore((state) => state.addArtworkId);
+  const removeArtworkId = useImageStore((state) => state.removeArtworkId);
 
   useEffect(() => {
     axios
@@ -35,11 +36,15 @@ export default function Galleri() {
   }, []);
 
   //funktion til checkboxe
-  const handleCheckboxChange = (imageUrl) => {
-    if (selectedImages.includes(imageUrl)) {
+  const handleCheckboxChange = (imageUrl, objectId) => {
+    const isSelected = selectedImages.includes(imageUrl);
+
+    if (isSelected) {
       removeImage(imageUrl);
+      removeArtworkId(objectId);
     } else {
       addImage(imageUrl);
+      addArtworkId(objectId);
     }
   };
 
@@ -69,7 +74,9 @@ export default function Galleri() {
               <input
                 type="checkbox"
                 checked={selectedImages.includes(imageUrl)}
-                onChange={() => handleCheckboxChange(imageUrl)}
+                onChange={() =>
+                  handleCheckboxChange(imageUrl, data.object_number)
+                }
                 className="absolute top-2 right-2 w-5 h-5 accent-blue-500"
               />
             </label>
