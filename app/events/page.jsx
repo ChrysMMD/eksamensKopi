@@ -4,6 +4,8 @@ import useEventStore from "../stores/useEventStore";
 import Button from "../components/Button";
 import EventList from "../components/EventList";
 import axios from "axios";
+import getLedigePladser from "../utils/getLedigePladser";
+import { useRouter } from "next/navigation";
 
 const api = axios.create({
   baseURL: "http://localhost:8080", // skift ved deploy
@@ -11,6 +13,7 @@ const api = axios.create({
 
 export default function EventPage() {
   const { events, setEvents } = useEventStore();
+  const router = useRouter();
 
   // hent events
   const fetchEvents = async () => {
@@ -56,7 +59,7 @@ export default function EventPage() {
         events={events}
         className="flex gap-4"
         renderEvent={(event) => {
-          const ledigePladser = event.totalTickets - event.bookedTickets;
+          const ledigePladser = getLedigePladser(event);
            
           return(
           <div className="w-64">
@@ -87,7 +90,7 @@ export default function EventPage() {
             {ledigePladser > 0 ? (
               <Button
                 variant="secondary"
-                onClick={() => handleBooking(event.id)}
+                onClick={() => router.push(`/book/${event.id}`)}
               >
                 Book
               </Button>
