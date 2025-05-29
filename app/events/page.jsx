@@ -12,54 +12,94 @@ const api = axios.create({
 export default function EventPage() {
   const { events, setEvents } = useEventStore();
 
+  // hent events
+  const fetchEvents = async () => {
+    try {
+      const res = await api.get("/events");
+      setEvents(res.data);
+    } catch (err) {
+      console.error("🚨 Kunne ikke hente events", err);
+    }
+  };
 
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const res = await api.get("/events");
-        setEvents(res.data);
-      } catch (err) {
-        console.error("🚨 Kunne ikke hente events", err);
+  // book events og genindlæs
+  const handleBooking = async (eventId) => {
+    try {
+      const res = await axios.put(`http://localhost:8080/events/${eventId}/book`, 
+  { tickets: 1 }, 
+  { headers: { "Content-Type": "application/json" } }
+);
+
+
+      if (res.status === 200) {
+        alert("Booking bekræftet!");
+        fetchEvents();
+      } else {
+        alert("Noget gik galt – prøv igen.");
       }
-    };
+    } catch (error) {
+      console.error("Booking-fejl:", error);
+      alert("Kunne ikke gennemføre booking.");
+    }
+  };
 
+  //hent events ved load
+  useEffect(() => {
     fetchEvents();
   }, []);
+
   return (
     <div>
-    <h1 className="font-h1 text-4xl mb-3">Kommende arangementer</h1>
-  
-    <EventList
-  events={events}
-  className="flex gap-4"
-  renderEvent={(event) => (
-    <div className="w-64">
-       {event.artworkIds?.length > 0 && (
-        <div>
-           <img
-          src={`https://iip-thumb.smk.dk/iiif/jp2/${event.artworkIds[0].toLowerCase()}.tif.jp2/full/!400,/0/default.jpg`}
-          alt=""
-          className="w-full h-40 object-cover"
-        />
-        </div>
-      )}
+      <h1 className="font-h1 text-4xl mb-3">Kommende arangementer</h1>
 
-    {/* taget fra chatgbt */}
-      <div className="p-2 flex flex-col justify-between h-[calc(100%-10rem)]">
-        <div>
-      <h3 className="text-lg font-bold text-purple-800">{event.title}</h3>
-      </div>
+      <EventList
+        events={events}
+        className="flex gap-4"
+        renderEvent={(event) => {
+          const ledigePladser = event.totalTickets - event.bookedTickets;
+           
+          return(
+          <div className="w-64">
+            {event.artworkIds?.length > 0 && (
+              <div>
+                <img
+                  src={`https://iip-thumb.smk.dk/iiif/jp2/${event.artworkIds[0].toLowerCase()}.tif.jp2/full/!400,/0/default.jpg`}
+                  alt=""
+                  className="w-full h-40 object-cover"
+                />
+              </div>
+            )}
 
-      <p className="text-sm text-gray-600">
-            📅 {event.date} • 🎫 {event.totalTickets} pladser
-            {event.pris && <> • 💸 {event.pris} kr</>}
-          </p>
+            {/* taget fra chatgbt */}
+            <div className="p-2 flex flex-col justify-between h-[calc(100%-10rem)]">
+              <div>
+                <h3 className="text-lg font-bold text-purple-800">
+                  {event.title}
+                </h3>
+              </div>
 
+              <p className="text-sm text-gray-600">
+                📅 {event.date} • 🎫 {ledigePladser}
+                ledige pladser
+                {event.pris && <> • 💸 {event.pris} kr</>}
+              </p>
+            </div>
+            {ledigePladser > 0 ? (
+              <Button
+                variant="secondary"
+                onClick={() => handleBooking(event.id)}
+              >
+                Book
+              </Button>
+            ) : (
+              <Button variant="secondary" disabled>
+                Udsolgt
+              </Button>
+            )}
+          </div>
+          );
+        }}
+      />
     </div>
-    </div>
-  )}
-/>
-</div>
-
   );
 }
