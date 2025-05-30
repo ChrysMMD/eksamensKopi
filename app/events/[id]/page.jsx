@@ -5,11 +5,13 @@ import { useParams } from 'next/navigation'
 import axios from 'axios'
 import getLedigePladser from '../../lib/getLedigePladser'
 import Button from '../../components/Button'
+import { useRouter } from 'next/navigation'
 
 export default function EventDetailPage() {
   const { id } = useParams()
   const [event, setEvent] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
     async function fetchEvent() {
@@ -53,11 +55,11 @@ export default function EventDetailPage() {
 
       {/* Booking-knap */}
       {ledigePladser > 0 ? (
-        <Button variant="primary" onClick={() => alert('Booking gennemført!')}>
+        <Button variant="secondary" onClick={() => router.push(`/book/${event.id}`)}>
           Book billet
         </Button>
       ) : (
-        <Button variant="primary" disabled>
+        <Button variant="secondary" disabled>
           Udsolgt
         </Button>
       )}

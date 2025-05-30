@@ -11,27 +11,40 @@ export default function BookingPage() {
   const { eventId } = useParams();
   const router = useRouter();
   const { events, updateEvent } = useEventStore();
-  const event = events.find((e) => e.id === eventId);
+
   const [notFound, setNotFound] = useState(false);
+  const [event, setEvent] = useState(null);
 
+  // debug logs
+  console.log("🆔 eventId fra URL:", eventId);
+  console.log("📦 events fra store:", events);
 
-   // Hent event
   useEffect(() => {
-  const match = events.find((e) => e.id === eventId);
-  if (!match && eventId) {
-    axios.get(`http://localhost:8080/events/${eventId}`)
-      .then((res) => {
-        updateEvent(res.data); // 👈 det er nok!
-      })
-      .catch((err) => {
-        console.error("Kunne ikke hente event:", err);
-        setNotFound(true);
-      });
-  }
-}, [eventId, events]);
+    const match = events.find((e) => e.id === eventId);
 
+    if (eventId && !match) {
+      console.log("📡 Henter event fra backend:", eventId);
+      axios
+        .get(`http://localhost:8080/events/${eventId}`)
+        .then((res) => {
+          console.log("✅ Fik data:", res.data);
+          updateEvent(res.data);
+          setEvent(res.data);
+        })
+        .catch((err) => {
+          console.error("❌ Kunne ikke hente event:", err);
+          setNotFound(true);
+        });
+    } else if (match) {
+      console.log("🎯 Finder event i store:", match);
+      setEvent(match);
+    }
+  }, [eventId, events]);
 
-const handleSubmit = async (formData) => {
+  if (notFound) return <p>🚫 Event ikke fundet.</p>;
+  if (!event) return <p>⏳ Henter event...</p>;
+
+  const handleSubmit = async (formData) => {
     try {
       const res = await axios.put(
         `http://localhost:8080/events/${eventId}/book`,
@@ -41,26 +54,29 @@ const handleSubmit = async (formData) => {
 
       if (res.status === 200) {
         updateEvent(res.data.event);
-      const updatedEvent = {
-        ...event,
-        bookedTickets: res.data.event.bookedTickets
-      };
-      localStorage.setItem("bookingConfirmation", JSON.stringify({
-        event: updatedEvent,
-        name: formData.name,
-        email: formData.email,
-        tickets: formData.tickets
-      }));
-      router.push("/book/confirmation");
-    }
+
+        const updatedEvent = {
+          ...event,
+          bookedTickets: res.data.event.bookedTickets,
+        };
+
+        localStorage.setItem(
+          "bookingConfirmation",
+          JSON.stringify({
+            event: updatedEvent,
+            name: formData.name,
+            email: formData.email,
+            tickets: formData.tickets,
+          })
+        );
+
+        router.push("/book/confirmation");
+      }
     } catch (err) {
-      console.error("Booking-fejl:", err);
+      console.error("💥 Booking-fejl:", err);
       alert("Der skete en fejl under bookingen.");
     }
   };
-
-  if (notFound) return <p>Event ikke fundet.</p>;
-  if (!event) return <p>Henter event...</p>;
 
   return (
     <div className="flex flex-col md:flex-row gap-6 p-4">

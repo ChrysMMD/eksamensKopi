@@ -1,5 +1,6 @@
 import { create } from "zustand";
 
+//chatgbt
 const useEventStore = create((set) => ({
   events: [],
   setEvents: (events) => set({ events }),
