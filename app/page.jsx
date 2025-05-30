@@ -17,7 +17,7 @@ export default function Home() {
   useEffect(() => {
     async function fetchImage() {
       try {
-        const res = await fetch('https://api.smk.dk/api/v1/art/?filters=has_image:true&size=100')
+        const res = await fetch('https://api.smk.dk/api/v1/art/search?keys=%2A&offset=0&rows=100')
         const data = await res.json()
         const items = data.items
   

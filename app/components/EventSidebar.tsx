@@ -1,4 +1,4 @@
-import getLedigePladser from "../utils/getLedigePladser";
+import getLedigePladser from "../lib/getLedigePladser";
 
 export default function EventSidebar({ event }) {
   const ledigePladser = getLedigePladser(event);
