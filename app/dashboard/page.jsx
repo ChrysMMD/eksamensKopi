@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import Crud from "../components/Crud";
 import Button from "../components/Button";
 import EventList from "../components/EventList";
-import api from "../lib/api/api";
+import api from "../lib/api";
 import DashboardCard from "../components/DashboardCard";
 
 export default function DashboardPage() {
@@ -37,10 +37,9 @@ export default function DashboardPage() {
   //gem
   const handleSave = async (formData) => {
     const eventToSend = {
-    ...formData,
-    curator: user?.firstName || "Ukendt", 
-  };
-    console.log("🔍 Data der sendes til serveren:", eventToSend);
+      ...formData,
+      curator: user?.firstName || "Ukendt",
+    };
 
     try {
       let response;
@@ -51,15 +50,21 @@ export default function DashboardPage() {
           prev.map((event) => (event.id === editingId ? response.data : event))
         );
       } else {
+        console.log("📦 Klar til at sende:", eventToSend);
+
         response = await api.post("/events", eventToSend);
+        console.log("✅ Serverens svar:", response);
         setEvents((prev) => [response.data, ...prev]);
       }
 
       setShowCrudForm(false);
       setEditingId(null);
     } catch (err) {
-      console.error("Kunne ikke gemme event:", err);
-      alert("Noget gik galt. Se konsollen.");
+      if (err.response) {
+        console.error("🧨 Fejl-svar fra backend:", err.response.data);
+      } else {
+        console.error("🧨 Ingen svar, fejl i request:", err.message);
+      }
     }
   };
 

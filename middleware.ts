@@ -1,5 +1,7 @@
-// middleware.ts
+
 import { clerkMiddleware } from "@clerk/nextjs/server";
+
+
 
 const middleware = clerkMiddleware();
 

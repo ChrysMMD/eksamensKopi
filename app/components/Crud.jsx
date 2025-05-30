@@ -83,6 +83,7 @@ export default function Crud({ onSave, onCancel, initialData }) {
           return match ? match[1].toLowerCase() : null;
         })
         .filter(Boolean),
+        images: selectedImages,
     });
   };
 
