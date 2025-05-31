@@ -1,25 +1,28 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import Button from "./Button";
 import Galleri from "./Galleri";
 import useImageStore from "../stores/useImageStore";
 import axios from "axios";
 
-export default function Crud({ onSave, onCancel, initialData }) {
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    totalTickets: "",
-    price: "",
-    date: "",
-    isDraft: false,
-    locationId: "",
-  });
+export default function Crud({ onSave, onCancel, initialData, existingEvents }) {
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    getValues,
+    formState: { errors },
+    watch,
+  } = useForm();
 
   const [locations, setLocations] = useState([]);
-  const selectedImages = useImageStore((state) => state.selectedImages);
   const [validDates, setValidDates] = useState([]);
+  const [conflictError, setConflictError] = useState("");
+  const selectedImages = useImageStore((state) => state.selectedImages);
+  const watchDate = watch("date");
+  const watchLocationId = watch("locationId");
 
   // Hent datoer
   useEffect(() => {
@@ -41,55 +44,59 @@ export default function Crud({ onSave, onCancel, initialData }) {
   useEffect(() => {
     if (initialData) {
       const { location, ...rest } = initialData;
-
-      setFormData((prev) => ({
-        ...prev,
-        ...rest,
-        totalTickets: rest.totalTickets?.toString() || "",
-        price: rest.price?.toString() || "",
-        date: rest.date || "",
-        locationId: rest.locationId || "",
-      }));
+      Object.entries(rest).forEach(([key, value]) => {
+        setValue(key, value);
+      });
     }
-  }, [initialData]);
+  }, [initialData, setValue]);
 
-  // Input ændringer
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
+  // Konflikttjek automatisk
+  useEffect(() => {
+    const currentDate = watchDate;
+    const currentLocation = watchLocationId;
 
-  // Gem event
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!formData.title || !formData.locationId) return;
+    if (currentDate && currentLocation) {
+      const conflict = existingEvents.find((e) => {
+        return (
+          String(e.locationId) === String(currentLocation) &&
+          e.date === currentDate &&
+          e.id !== initialData?.id
+        );
+      });
+
+      setConflictError(conflict ? "⚠️ Dato og lokation er allerede optaget." : "");
+    }
+  }, [watchDate, watchLocationId, existingEvents, initialData]);
+
+  // OnSubmit
+  const onSubmit = (data, isDraft = false) => {
+    if (conflictError) return;
 
     const selectedLocation = locations.find(
-      (loc) => loc.id === formData.locationId
+      (loc) => String(loc.id) === String(data.locationId)
     );
-    const onlyDate = formData.date.split("T")[0];
 
-    onSave({
-      ...formData,
-      date: onlyDate,
-      totalTickets: Number(formData.totalTickets),
-      price: Number(formData.price),
+    const newEvent = {
+      ...data,
+      isDraft,
+      date: data.date.split("T")[0],
+      totalTickets: Number(data.totalTickets || 0),
+      price: Number(data.price || 0),
       artworkIds: selectedImages
         .map((url) => {
           const match = url.match(/_(kks[^.]+)\./i);
           return match ? match[1].toLowerCase() : null;
         })
         .filter(Boolean),
-        images: selectedImages,
-    });
+      images: selectedImages,
+    };
+
+    onSave(newEvent);
   };
 
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit((data) => onSubmit(data, false))}
       className="border p-6 rounded bg-gray-50 mb-8 space-y-4"
     >
       <h2 className="text-xl font-bold">
@@ -98,40 +105,35 @@ export default function Crud({ onSave, onCancel, initialData }) {
 
       <input
         className="border rounded p-2 w-full"
-        name="title"
         placeholder="Event titel"
-        value={formData.title}
-        onChange={handleChange}
+        {...register("title", { required: "Titel er påkrævet" })}
       />
+      {errors.title && <p className="text-red-600">{errors.title.message}</p>}
+
       <textarea
         className="border rounded p-2 w-full"
-        name="description"
         placeholder="Event beskrivelse"
-        value={formData.description}
-        onChange={handleChange}
+        {...register("description", { required: "Beskrivelse er påkrævet" })}
       />
+      {errors.description && <p className="text-red-600">{errors.description.message}</p>}
+
       <input
         type="number"
         className="border rounded p-2 w-full"
-        name="totalTickets"
-        placeholder="Antal ledige pladser"
-        value={formData.totalTickets}
-        onChange={handleChange}
+        placeholder="Antal billetter"
+        {...register("totalTickets")}
       />
+
       <input
         type="number"
         className="border rounded p-2 w-full"
-        name="price"
         placeholder="Pris"
-        value={formData.price}
-        onChange={handleChange}
+        {...register("price")}
       />
+
       <select
         className="border rounded p-2 w-full"
-        name="date"
-        value={formData.date}
-        onChange={handleChange}
-        required
+        {...register("date", { required: "Dato er påkrævet" })}
       >
         <option value="">Vælg dato</option>
         {validDates.map((date) => (
@@ -140,13 +142,11 @@ export default function Crud({ onSave, onCancel, initialData }) {
           </option>
         ))}
       </select>
+      {errors.date && <p className="text-red-600">{errors.date.message}</p>}
 
       <select
         className="border rounded p-2 w-full"
-        name="locationId"
-        value={formData.locationId}
-        onChange={handleChange}
-        required
+        {...register("locationId", { required: "Lokation er påkrævet" })}
       >
         <option value="">Vælg lokation</option>
         {locations.map((loc) => (
@@ -155,23 +155,23 @@ export default function Crud({ onSave, onCancel, initialData }) {
           </option>
         ))}
       </select>
+      {errors.locationId && <p className="text-red-600">{errors.locationId.message}</p>}
+
+      {conflictError && <p className="text-red-600">{conflictError}</p>}
 
       <Galleri />
 
-      <label className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          name="isDraft"
-          checked={formData.isDraft}
-          onChange={handleChange}
-        />
-        Gem som kladde
-      </label>
-
       <div className="flex gap-4 mt-4">
-        <Button type="submit" size="md" variant="secondary">
-          {initialData ? "Gem ændringer" : "Opret event"}
+        <Button type="submit">Opret event</Button>
+
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={handleSubmit((data) => onSubmit(data, true))}
+        >
+          Gem som kladde
         </Button>
+
         <button
           type="button"
           onClick={onCancel}

@@ -11,8 +11,24 @@ import DashboardCard from "../components/DashboardCard";
 export default function DashboardPage() {
   const { user } = useUser();
   const [events, setEvents] = useState([]);
+  const [locations, setLocations] = useState([]);
+
   const [showCrudForm, setShowCrudForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+
+  //hentning af locations fra backend
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const res = await api.get("/locations");
+        setLocations(res.data);
+      } catch (err) {
+        console.error("Kunne ikke hente lokationer:", err);
+      }
+    };
+
+    fetchLocations();
+  }, []);
 
   //hentning af events fra backend
   useEffect(() => {
@@ -40,21 +56,55 @@ export default function DashboardPage() {
       ...formData,
       curator: user?.firstName || "Ukendt",
     };
+    console.log("📦 Klar til at sende:", eventToSend);
+
+    const conflict = events.find((e) => {
+      const sameLocation = String(e.locationId) === String(formData.locationId);
+      const sameDate = e.date === formData.date;
+      const notSameEvent = e.id !== editingId;
+
+      return sameLocation && sameDate && notSameEvent;
+    });
+
+    if (conflict) {
+      alert("Der findes allerede et event med denne lokation og dato.");
+      return;
+    }
 
     try {
       let response;
 
       if (editingId) {
         response = await api.patch(`/events/${editingId}`, eventToSend);
+
+        // Find tilhørende lokation
+        const locationObj = locations.find(
+          (loc) => String(loc.id) === String(response.data.locationId)
+        );
+
         setEvents((prev) =>
-          prev.map((event) => (event.id === editingId ? response.data : event))
+          prev.map((event) =>
+            event.id === editingId
+              ? { ...response.data, location: locationObj || null }
+              : event
+          )
         );
       } else {
         console.log("📦 Klar til at sende:", eventToSend);
 
         response = await api.post("/events", eventToSend);
         console.log("✅ Serverens svar:", response);
-        setEvents((prev) => [response.data, ...prev]);
+        console.log("🧪 Inkluderer svar isDraft?", response.data.isDraft);
+
+        // Find tilhørende lokation
+        const locationObj = locations.find(
+          (loc) => String(loc.id) === String(response.data.locationId)
+        );
+
+        setEvents((prev) => [
+          { ...response.data, location: locationObj || null },
+          ...prev,
+        ]);
       }
 
       setShowCrudForm(false);
@@ -91,6 +141,7 @@ export default function DashboardPage() {
 
       {showCrudForm && (
         <Crud
+        existingEvents={events}
           initialData={events.find((e) => e.id === editingId)}
           onSave={handleSave}
           onCancel={() => {
@@ -100,18 +151,35 @@ export default function DashboardPage() {
         />
       )}
 
-      <EventList
-        events={events}
-        title="Eventoversigt"
-        titleClassName="text-2xl font-semibold mb-4"
-        renderEvent={(event) => (
-          <DashboardCard
-            event={event}
-            onEdit={() => handleEdit(event)}
-            onDelete={handleDelete}
+      <div className="space-y-10">
+        <div>
+          <h2 className="text-3xl font-bold mb-4">Offentlige events</h2>
+          <EventList
+            events={events.filter((e) => !e.isDraft)}
+            renderEvent={(event) => (
+              <DashboardCard
+                event={event}
+                onEdit={() => handleEdit(event)}
+                onDelete={handleDelete}
+              />
+            )}
           />
-        )}
-      />
+        </div>
+
+        <div>
+          <h2 className="text-3xl font-bold mb-4">Kladder</h2>
+          <EventList
+            events={events.filter((e) => e.isDraft)}
+            renderEvent={(event) => (
+              <DashboardCard
+                event={event}
+                onEdit={() => handleEdit(event)}
+                onDelete={handleDelete}
+              />
+            )}
+          />
+        </div>
+      </div>
     </div>
   );
 }
