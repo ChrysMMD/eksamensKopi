@@ -97,7 +97,7 @@ export default function Crud({ onSave, onCancel, initialData, existingEvents }) 
   return (
     <form
       onSubmit={handleSubmit((data) => onSubmit(data, false))}
-      className="border p-6 rounded bg-gray-50 mb-8 space-y-4"
+      className="border rounded border-[var(--color-lightgreen)] p-6 bg-gray-50 mb-8 space-y-4"
     >
       <h2 className="text-xl font-bold">
         {initialData ? "Rediger event" : "Opret nyt event"}
@@ -122,13 +122,6 @@ export default function Crud({ onSave, onCancel, initialData, existingEvents }) 
         className="border rounded p-2 w-full"
         placeholder="Antal billetter"
         {...register("totalTickets")}
-      />
-
-      <input
-        type="number"
-        className="border rounded p-2 w-full"
-        placeholder="Pris"
-        {...register("price")}
       />
 
       <select
@@ -162,7 +155,11 @@ export default function Crud({ onSave, onCancel, initialData, existingEvents }) 
       <Galleri />
 
       <div className="flex gap-4 mt-4">
-        <Button type="submit">Opret event</Button>
+        <Button 
+        type="submit"
+        variant="secondary"
+        >Opret event
+        </Button>
 
         <Button
           type="button"

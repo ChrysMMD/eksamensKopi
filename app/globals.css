@@ -64,11 +64,19 @@ body {
     @apply text-2xl font-bold mb-1 mt-7;
   }
 
+  h1 {
+    @apply text-3xl;
+    font-family: var(--font-h1);
+    font-size: 3rem;
+  }
+
   label {
     @apply block text-[var(--color-darkgreen)] font-semibold mb-1;
   }
 
-  input{
+  input,
+  textarea,
+  select{
     @apply w-full px-3 py-2;
   border: 1px solid var(--color-sand);
   }

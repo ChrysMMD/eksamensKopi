@@ -14,7 +14,7 @@ export default function BookingForm({ onSubmit }) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="space-y-4 bg-white p-4 rounded shadow"
+      className="space-y-4 bg-gray-50 p-4 rounded shadow"
     >
       {/* Navn */}
       <div>

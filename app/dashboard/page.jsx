@@ -7,6 +7,7 @@ import Button from "../components/Button";
 import EventList from "../components/EventList";
 import api from "../lib/api";
 import DashboardCard from "../components/DashboardCard";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const { user } = useUser();
@@ -15,6 +16,8 @@ export default function DashboardPage() {
 
   const [showCrudForm, setShowCrudForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
+
+  const router = useRouter();
 
   //hentning af locations fra backend
   useEffect(() => {
@@ -131,17 +134,30 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-6">
-        Velkommen {user?.firstName || "bruger"}
-      </h1>
+      <h1 className="mb-3">Velkommen {user?.firstName || "bruger"}</h1>
 
-      <Button onClick={() => setShowCrudForm(!showCrudForm)}>
-        {showCrudForm ? "Luk formular" : "Opret nyt event"}
-      </Button>
+      <div className="flex flex-rows gap-10">
+
+        <Button
+          variant="secondary"
+          className="mb-4"
+          onClick={() => setShowCrudForm(!showCrudForm)}
+        >
+          {showCrudForm ? "Luk formular" : "Opret nyt event"}
+        </Button>
+
+         <Button
+          variant="secondary"
+          className="mb-4"
+          onClick={() => router.push('/events')}
+        >
+          Til Offentligliste
+        </Button>
+      </div>
 
       {showCrudForm && (
         <Crud
-        existingEvents={events}
+          existingEvents={events}
           initialData={events.find((e) => e.id === editingId)}
           onSave={handleSave}
           onCancel={() => {
@@ -153,7 +169,7 @@ export default function DashboardPage() {
 
       <div className="space-y-10">
         <div>
-          <h2 className="text-3xl font-bold mb-4">Offentlige events</h2>
+          <h2>Offentlige events</h2>
           <EventList
             events={events.filter((e) => !e.isDraft)}
             renderEvent={(event) => (
@@ -167,7 +183,7 @@ export default function DashboardPage() {
         </div>
 
         <div>
-          <h2 className="text-3xl font-bold mb-4">Kladder</h2>
+          <h2>Kladder</h2>
           <EventList
             events={events.filter((e) => e.isDraft)}
             renderEvent={(event) => (

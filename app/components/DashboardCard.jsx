@@ -14,12 +14,11 @@ export default function DashboardCard({ event, onEdit, onDelete }) {
           <p>{event.description}</p>
 
           <p className="text-sm text-gray-600">
-            📅 {event.date} • 🎫 {event.totalTickets} pladser
-            {event.price && <> • 💸 {event.price} kr</>}
+            {event.date} • {event.totalTickets} pladser
           </p>
 
           <p className="text-sm italic text-gray-500">
-            📍 Lokation: {event.location?.name || "Ukendt"}
+             Lokation: {event.location?.name || "Ukendt"}
           </p>
 
           {(event.artworkIds?.length > 0 || event.images?.length > 0) && (
