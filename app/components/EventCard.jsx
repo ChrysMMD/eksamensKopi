@@ -21,10 +21,9 @@ export default function EventCard({ event }) {
 
         <div className="p-2 flex flex-col justify-between h-[calc(100%-10rem)]">
           <div>
-            <h3 className="text-lg font-bold text-purple-800">{event.title}</h3>
+            <h3 className="text-lg font-bold text-green-950">{event.title}</h3>
             <p className="text-sm text-gray-600">
-              📅 {event.date} • 🎫 {ledigePladser} ledige pladser
-              {event.pris && <> • 💸 {event.pris} kr</>}
+              {event.date} • {ledigePladser} ledige pladser
             </p>
           </div>
 

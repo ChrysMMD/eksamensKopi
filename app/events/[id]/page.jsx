@@ -35,9 +35,9 @@ export default function EventDetailPage() {
 
   return (
     <main className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-3xl font-bold mb-2">{event.title}</h1>
-      <p className="text-gray-600 mb-4">
-        📅 {event.date} • 📍 {event.location?.name} • 🎫 {ledigePladser} ledige pladser
+      <h1 className="font-h1 text-lg/10">{event.title}</h1>
+      <p className="text-gray-600 mb-4 text-sm">
+         {event.date} • {event.location?.name} •  {ledigePladser} ledige pladser
       </p>
       <p className="mb-6">{event.description}</p>
 

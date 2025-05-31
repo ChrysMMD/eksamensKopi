@@ -10,9 +10,10 @@ const sizeClasses = {
 
 //knap-varianter
 const variantClasses = {
-  primary: "text-white hover:bg-[var(--color-rust)] hover:border-none cursor-pointer",
-  secondary: "bg-[var(--color-rust)] text-white border hover:bg-white hover:text-[var(--color-rust)]",
-  outline: "bg-transparent border text-[var(--color-rust)] hover:bg-gray-100",
+  primary: "text-white hover:bg-gray-300/30 cursor-pointer",
+  secondary: "bg-white text-[var(--color-rust)] hover:border-[var(--color-darkgreen)] hover:text-[var(--color-darkgreen)] hover:boder-[var(--color-darkgreen)]",
+  selected: "border-white bg-[var(--color-lightgreen)] text-[var(--color-offwhite)] hover:bg-[var(--color-darkgreen)]",
+  unselected:"border-[var(--color-darkgreen)] text-[var(--color-darkgreen)] hover:bg-[var(--color-lightgreen)] hover:text-white hover:border-white",
 };
 
 //default visning
@@ -28,7 +29,7 @@ export default function Button({
         <button
         type={type}
         onClick={onClick}
-        className={`font-bold border shadow cursor-pointer ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+        className={`font-bold border cursor-pointer ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
     >
         {children}
     </button>

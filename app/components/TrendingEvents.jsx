@@ -11,7 +11,7 @@ export default function TrendingEvents() {
 
   return (
     <section>
-      <h2 className="text-xl font-bold mb-2">🔥 Mest Trending</h2>
+      <h2>Mest Trending</h2>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {trending.map((event) => (
           <EventCard key={event.id} event={event} />

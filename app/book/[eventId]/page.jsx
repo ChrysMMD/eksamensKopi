@@ -82,7 +82,7 @@ export default function BookingPage() {
     <div className="flex flex-col md:flex-row gap-6 p-4">
       <EventSidebar event={event} />
       <div className="flex-1">
-        <h1 className="text-2xl font-bold mb-4 text-purple-800">Book billet</h1>
+        <h1 className="font-h1">Book billet</h1>
         <BookingForm onSubmit={handleSubmit} />
       </div>
     </div>

@@ -57,6 +57,7 @@ export default function EventPage() {
       <h1 className="font-h1 text-4xl mb-3">Kommende arrangementer</h1>
 
       <TrendingEvents />
+      <div className="h-[2px] bg-[var(--color-orange)]/20 mb-4 mt-8"></div>
       <DiscoverEvents />
     </div>
   )

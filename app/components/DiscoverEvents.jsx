@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { format, addMonths } from 'date-fns'
 import useEventStore from '../stores/useEventStore'
 import EventCard from './EventCard'
+import Button from './Button'
 
 export default function DiscoverEvents() {
   const events = useEventStore((state) => state.events)
@@ -22,21 +23,17 @@ export default function DiscoverEvents() {
 
   return (
     <section className="mb-8">
-      <h2 className="text-2xl font-bold mb-2">🔍 Discover</h2>
+      <h2>Discover</h2>
 
       <div className="flex gap-2 mb-4">
         {months.map((month) => (
-          <button
+          <Button
             key={month}
             onClick={() => setSelectedMonth(month === selectedMonth ? '' : month)}
-            className={`px-4 py-1 rounded transition ${
-              selectedMonth === month
-                ? 'bg-black text-white'
-                : 'bg-gray-200 hover:bg-gray-300'
-            }`}
+            variant={selectedMonth === month ? 'selected' : 'unselected'}
           >
             {month}
-          </button>
+          </Button>
         ))}
       </div>
 
