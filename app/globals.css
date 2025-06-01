@@ -38,7 +38,6 @@
 
 body {
   background: white ;
-  color: var(--foreground);
   font-family: var(--font-body);
   padding: 1rem;
 }
@@ -62,7 +61,7 @@ body {
 @layer base {
   h2 {
     @apply text-2xl font-bold mb-1 mt-7;
-    color: var(--color-lightgreen) !important;
+    color: var(--color-lightgreen);
   }
 
 
