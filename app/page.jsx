@@ -66,7 +66,7 @@ export default function Home() {
 
       {/* Content */}
       <section className="z-10 text-center px-4">
-        <h1 className="text-5xl font-h1 md:text-6xl font-bold mb-4">Velkommen til Eventportalen</h1>
+        <h1 className="text-white text-5xl font-h1 md:text-6xl font-bold mb-4">Velkommen til Events-portalen</h1>
         <h2 className="text-xl md:text-2xl font-light mb-8">Find spændende begivenheder nær dig</h2>
         
 <Link href="/events">

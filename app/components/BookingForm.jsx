@@ -9,8 +9,10 @@ export default function BookingForm({ onSubmit }) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
-  } = useForm();
+    formState: { errors, isValid, isSubmitting },
+  } = useForm({
+    mode: "onBlur",
+  });
 
    const router = useRouter();
 
@@ -69,7 +71,7 @@ export default function BookingForm({ onSubmit }) {
       </div>
 
       <div className="flex gap-2">
-        <Button type="submit" variant="secondary">
+        <Button type="submit" variant="secondary" disabled={!isValid || isSubmitting}>
           Bekræft booking
         </Button>
 

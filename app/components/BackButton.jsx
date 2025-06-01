@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import Button from './Button' 
 
-export default function BackButton({ label = 'Tilbage', className = '', size = 'sm' }) {
+export default function BackButton({ label = '← Tilbage', className = '', size = 'sm' }) {
   const router = useRouter()
 
   return (

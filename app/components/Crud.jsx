@@ -13,9 +13,9 @@ export default function Crud({ onSave, onCancel, initialData, existingEvents }) 
     handleSubmit,
     setValue,
     getValues,
-    formState: { errors },
+    formState: { errors, isValid, isSubmitting },
     watch,
-  } = useForm();
+  } = useForm({ mode: "onBlur" })
 
   const [locations, setLocations] = useState([]);
   const [validDates, setValidDates] = useState([]);
@@ -164,6 +164,7 @@ export default function Crud({ onSave, onCancel, initialData, existingEvents }) 
         <Button
           type="button"
           variant="secondary"
+          disabled={!isValid || isSubmitting} 
           onClick={handleSubmit((data) => onSubmit(data, true))}
         >
           Gem som kladde
