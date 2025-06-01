@@ -11,7 +11,7 @@ export default function TrendingEvents() {
 
   return (
     <section>
-      <h2 className="text-[var(--color-lightgreen)]">Mest Trending</h2>
+      <h2>Mest Trending</h2>
       <div className="flex gap-4 overflow-x-auto pb-4">
         {trending.map((event) => (
           <div className="min-w-[250px] flex-shrink-0" key={event.id}>
