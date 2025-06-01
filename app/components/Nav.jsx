@@ -22,6 +22,12 @@ export default function Nav() {
 
         <SignedIn>
           <UserButton signOutUrl="/" forceRedirectUrl="/" />
+          <Link
+            href="/dashboard"
+            className="inline-block bg-[var(--color-lightgreen)] text-white px-4 py-2 rounded hover:opacity-80"
+          >
+            Gå til Dashboard
+          </Link>
         </SignedIn>
       </div>
     </nav>
