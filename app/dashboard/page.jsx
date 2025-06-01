@@ -151,7 +151,7 @@ export default function DashboardPage() {
           className="mb-4"
           onClick={() => router.push('/events')}
         >
-          Til Offentligliste
+          Til offentlig liste
         </Button>
       </div>
 

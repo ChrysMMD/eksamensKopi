@@ -6,6 +6,7 @@ import useEventStore from "../../stores/useEventStore";
 import EventSidebar from "../../components/EventSidebar";
 import BookingForm from "../../components/BookingForm";
 import axios from "axios";
+import Button from "../../components/Button";
 
 export default function BookingPage() {
   const { eventId } = useParams();
@@ -88,3 +89,4 @@ export default function BookingPage() {
     </div>
   );
 }
+ 

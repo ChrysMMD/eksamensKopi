@@ -68,6 +68,7 @@ body {
     @apply text-3xl;
     font-family: var(--font-h1);
     font-size: 3rem;
+    color: var(--color-darkgreen)
   }
 
   label {

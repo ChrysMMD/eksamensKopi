@@ -2,6 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import Button from "./Button";
+import {useRouter} from "next/navigation"
 
 export default function BookingForm({ onSubmit }) {
   //chatgbt
@@ -11,6 +12,12 @@ export default function BookingForm({ onSubmit }) {
     formState: { errors },
   } = useForm();
 
+   const router = useRouter();
+
+  const handleCancel = () => {
+    router.back();
+  };
+  
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -22,7 +29,6 @@ export default function BookingForm({ onSubmit }) {
         <input
           type="text"
           {...register("name", { required: "Navn er påkrævet" })}
-          
         />
         {errors.name && (
           <p className="text-red-600 text-sm mt-1">{errors.name.message}</p>
@@ -41,7 +47,6 @@ export default function BookingForm({ onSubmit }) {
               message: "Ugyldig email-adresse",
             },
           })}
-        
         />
         {errors.email && (
           <p className="text-red-600 text-sm mt-1">{errors.email.message}</p>
@@ -63,12 +68,15 @@ export default function BookingForm({ onSubmit }) {
         )}
       </div>
 
-      <Button
-        type="submit"
-        variant="secondary"
-      >
-        Bekræft booking
-      </Button>
+      <div className="flex gap-2">
+        <Button type="submit" variant="secondary">
+          Bekræft booking
+        </Button>
+
+        <Button onClick={handleCancel} variant="back" size="sm">
+          Annuller
+        </Button>
+      </div>
     </form>
   );
 }

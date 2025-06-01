@@ -8,36 +8,50 @@ import Button from './components/Button'
 import Nav from './components/Nav'
 
 export default function Home() {
-  const [backgroundUrl, setBackgroundUrl] = useState('')
+  const [backgroundUrl, setBackgroundUrl] = useState('https://iip-thumb.smk.dk/iiif/jp2/4b29bb21t_kksgb22213.tif.jp2/full/!1024,/0/default.jpg')
 
   const imageId = 'KKSgb22230'
   const API_URL = 'https://api.smk.dk/api/v1/art/?filters=has_image:true&size=100'
 
 
   useEffect(() => {
-    async function fetchImage() {
-      try {
-        const res = await fetch('https://api.smk.dk/api/v1/art/search?keys=%2A&offset=0&rows=100')
-        const data = await res.json()
-        const items = data.items
-  
-        if (!items || items.length === 0) {
-          setBackgroundUrl('https://iip-thumb.smk.dk/iiif/jp2/4b29bb21t_kksgb22213.tif.jp2/full/!1024,/0/default.jpg')
-          return
-        }
-  
-        const randomItem = items[Math.floor(Math.random() * items.length)]
-        setBackgroundUrl(randomItem.image || randomItem.image_thumbnail)
-      } catch (err) {
-        console.error('Fejl ved hentning af billede:', err)
+  async function fetchImage() {
+    try {
+      const res = await fetch('https://api.smk.dk/api/v1/art/search?keys=%2A&offset=0&rows=100')
+      const data = await res.json()
+      const items = data.items
+
+      if (!items || items.length === 0) {
         setBackgroundUrl('https://iip-thumb.smk.dk/iiif/jp2/4b29bb21t_kksgb22213.tif.jp2/full/!1024,/0/default.jpg')
+        return
       }
+
+      let foundImage = null
+
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i]
+        if (item.image || item.image_thumbnail) {
+          foundImage = item.image || item.image_thumbnail
+          break
+        }
+      }
+
+      setBackgroundUrl(
+        foundImage ??
+        'https://iip-thumb.smk.dk/iiif/jp2/4b29bb21t_kksgb22213.tif.jp2/full/!1024,/0/default.jpg'
+      )
+
+    } catch (err) {
+      console.error('Fejl ved hentning af billede:', err)
+      setBackgroundUrl('https://iip-thumb.smk.dk/iiif/jp2/4b29bb21t_kksgb22213.tif.jp2/full/!1024,/0/default.jpg')
     }
+  }
+
+  fetchImage()
+}, [])
+
   
-    fetchImage()
-  }, [])
-  
-  
+
 
   return (
     <main

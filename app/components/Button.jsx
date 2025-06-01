@@ -10,10 +10,11 @@ const sizeClasses = {
 
 //knap-varianter
 const variantClasses = {
-  primary: "text-white hover:bg-gray-300/30 cursor-pointer",
-  secondary: "bg-none text-[var(--color-rust)] hover:border-[var(--color-darkgreen)] hover:text-[var(--color-darkgreen)] hover:boder-[var(--color-darkgreen)]",
-  selected: "border-white bg-[var(--color-lightgreen)] text-[var(--color-offwhite)] hover:bg-[var(--color-darkgreen)]",
-  unselected:"border-[var(--color-darkgreen)] text-[var(--color-darkgreen)] hover:bg-[var(--color-lightgreen)] hover:text-white hover:border-white",
+  primary: "rounded text-white hover:bg-gray-300/30 cursor-pointer",
+  secondary: "rounded bg-none text-[var(--color-rust)] hover:border-[var(--color-darkgreen)] hover:text-[var(--color-darkgreen)] hover:boder-[var(--color-darkgreen)]",
+  back: "border-none text-[var(--color-lightgreen)] hover:text-[var(--color-darkgreen)] ",
+  selected: "rounded border-white bg-[var(--color-lightgreen)] text-[var(--color-offwhite)] hover:bg-[var(--color-darkgreen)]",
+  unselected:"rounded border-[var(--color-darkgreen)] text-[var(--color-darkgreen)] hover:bg-[var(--color-lightgreen)] hover:text-white hover:border-white",
 };
 
 //default visning

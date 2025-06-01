@@ -6,6 +6,7 @@ import axios from 'axios'
 import getLedigePladser from '../../lib/getLedigePladser'
 import Button from '../../components/Button'
 import { useRouter } from 'next/navigation'
+import BackButton from '../../components/BackButton'
 
 export default function EventDetailPage() {
   const { id } = useParams()
@@ -34,7 +35,7 @@ export default function EventDetailPage() {
   const ledigePladser = getLedigePladser(event)
 
   return (
-    <main className="p-6 max-w-3xl mx-auto">
+    <div className="p-6 max-w-3xl mx-auto border border-[var(--color-orange)]">
       <h1 className="font-h1 text-lg/10">{event.title}</h1>
       <p className="text-gray-600 mb-4 text-sm">
          {event.date} • {event.location?.name} •  {ledigePladser} ledige pladser
@@ -63,6 +64,8 @@ export default function EventDetailPage() {
           Udsolgt
         </Button>
       )}
-    </main>
+
+      <BackButton></BackButton>
+    </div>
   )
 }

@@ -6,6 +6,7 @@ import getLedigePladser from "../lib/getLedigePladser";
 import { useRouter } from "next/navigation";
 import DiscoverEvents from '../components/DiscoverEvents';
 import TrendingEvents from '../components/TrendingEvents';
+import Button from "../components/Button";
 
 
 const api = axios.create({
