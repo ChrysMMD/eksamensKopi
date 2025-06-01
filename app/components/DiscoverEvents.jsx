@@ -23,7 +23,7 @@ export default function DiscoverEvents() {
 
   return (
     <section className="mb-8">
-      <h2>Discover</h2>
+      <h2 className='text-[var(--color-lightgreen)]'>Discover</h2>
 
       <div className="flex gap-2 mb-4">
         {months.map((month) => (
