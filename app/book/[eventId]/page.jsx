@@ -26,7 +26,7 @@ export default function BookingPage() {
     if (eventId && !match) {
       console.log("📡 Henter event fra backend:", eventId);
       axios
-        .get(`http://localhost:8080/events/${eventId}`)
+        .get(`https://async-exhibit-server-1qfz.onrender.com/events/${eventId}`)
         .then((res) => {
           console.log("✅ Fik data:", res.data);
           updateEvent(res.data);
@@ -48,7 +48,7 @@ export default function BookingPage() {
   const handleSubmit = async (formData) => {
     try {
       const res = await axios.put(
-        `http://localhost:8080/events/${eventId}/book`,
+        `https://async-exhibit-server-1qfz.onrender.com/events/${eventId}/book`,
         { tickets: Number(formData.tickets) },
         { headers: { "Content-Type": "application/json" } }
       );

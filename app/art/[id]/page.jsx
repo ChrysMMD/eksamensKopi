@@ -45,7 +45,7 @@ export default async function VaerkDetalje({ params }) {
   const billedeUrl =
     vaerk.image_thumbnail ||
     (vaerk.image_iiif_id
-      ? `${vaerk.image_iiif_id}/full/!400,/0/default.jpg`
+      ? `${vaerk.image_iiif_id}/full/!400,/0/default.webp`
       : null);
 
   return (
@@ -101,7 +101,7 @@ export default async function VaerkDetalje({ params }) {
               const thumb =
                 item.image_thumbnail ||
                 (item.image_iiif_id
-                  ? `${item.image_iiif_id}/full/!400,/0/default.jpg`
+                  ? `${item.image_iiif_id}/full/!400,/0/default.webp`
                   : null);
 
               return (

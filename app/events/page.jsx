@@ -10,7 +10,7 @@ import Button from "../components/Button";
 
 
 const api = axios.create({
-  baseURL: "http://localhost:8080", // skift ved deploy
+  baseURL: "https://async-exhibit-server-1qfz.onrender.com"
 });
 
 export default function EventPage() {
@@ -30,7 +30,7 @@ export default function EventPage() {
   // booking
   const handleBooking = async (eventId) => {
     try {
-      const res = await axios.put(`http://localhost:8080/events/${eventId}/book`, 
+      const res = await axios.put(`https://async-exhibit-server-1qfz.onrender.com/events/${eventId}/book`, 
   { tickets: 1 }, 
   { headers: { "Content-Type": "application/json" } }
 );

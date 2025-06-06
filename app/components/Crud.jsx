@@ -27,7 +27,7 @@ export default function Crud({ onSave, onCancel, initialData, existingEvents }) 
   // Hent datoer
   useEffect(() => {
     axios
-      .get("http://localhost:8080/dates")
+      .get("https://async-exhibit-server-1qfz.onrender.com/dates")
       .then((res) => setValidDates(res.data))
       .catch((err) => console.error("Kunne ikke hente datoer:", err));
   }, []);
@@ -35,7 +35,7 @@ export default function Crud({ onSave, onCancel, initialData, existingEvents }) 
   // Hent lokationer
   useEffect(() => {
     axios
-      .get("http://localhost:8080/locations")
+      .get("https://async-exhibit-server-1qfz.onrender.com/locations")
       .then((res) => setLocations(res.data))
       .catch((err) => console.error("Kunne ikke hente lokationer", err));
   }, []);
