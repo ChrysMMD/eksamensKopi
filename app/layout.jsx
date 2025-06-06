@@ -15,6 +15,12 @@ const inter = Inter({
   display: "swap",
 });
 
+export const metadata = {
+  title: "Statens Museum for Kunst– Eventportalen",
+  description: "Udforsk og book arrangementer på Statens Museum for Kunst.",
+  keywords: ["kunst", "udstillinger", "arrangementer", "book", "danmark"],
+};
+
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider

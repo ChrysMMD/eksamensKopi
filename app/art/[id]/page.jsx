@@ -1,5 +1,6 @@
 import axios from "axios";
 import Link from "next/link";
+import SmkImage from "../../components/SmkImage";
 
 async function hentVaerk(id) {
   const { data } = await axios.get(
@@ -42,12 +43,6 @@ export default async function VaerkDetalje({ params }) {
     ? await hentLignendeVaerker(vaerk.similar_images_url, vaerk.object_number)
     : [];
 
-  const billedeUrl =
-    vaerk.image_thumbnail ||
-    (vaerk.image_iiif_id
-      ? `${vaerk.image_iiif_id}/full/!400,/0/default.webp`
-      : null);
-
   return (
     <div className="p-4 max-w-3xl mx-auto">
       {/* Tilbage-knap */}
@@ -70,15 +65,13 @@ export default async function VaerkDetalje({ params }) {
       </p>
 
       {/* Billede */}
-      {billedeUrl ? (
-        <img
-          src={billedeUrl}
-          alt={vaerk.titles?.[0]?.title || "Ukendt titel"}
-          className="my-4 rounded shadow-lg"
-        />
-      ) : (
-        <p className="italic text-gray-500">Ingen billede tilgængelig</p>
-      )}
+      <SmkImage
+        iiifId={vaerk.image_iiif_id}
+        fallback={vaerk.image_thumbnail}
+        alt={vaerk.titles?.[0]?.title || "Ukendt titel"}
+        width={600}
+        height={450}
+      />
 
       {/* Materiale og teknik */}
       <p>
@@ -98,11 +91,6 @@ export default async function VaerkDetalje({ params }) {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {lignende.map((item) => {
               const title = item.titles?.[0]?.title || "Ukendt titel";
-              const thumb =
-                item.image_thumbnail ||
-                (item.image_iiif_id
-                  ? `${item.image_iiif_id}/full/!400,/0/default.webp`
-                  : null);
 
               return (
                 <Link
@@ -111,10 +99,12 @@ export default async function VaerkDetalje({ params }) {
                 >
                   <div className="aspect-[4/3] w-full overflow-hidden rounded shadow">
                     {thumb ? (
-                      <img
-                        src={thumb}
-                        alt={title}
-                        className="w-full h-full object-cover hover:opacity-80 transition"
+                      <SmkImage
+                        iiifId={vaerk.image_iiif_id}
+                        fallback={vaerk.image_thumbnail}
+                        alt={vaerk.titles?.[0]?.title || "Ukendt titel"}
+                        width={600}
+                        height={450}
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-200 flex items-center justify-center">

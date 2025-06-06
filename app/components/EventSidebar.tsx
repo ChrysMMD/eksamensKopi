@@ -1,3 +1,4 @@
+import SmkImage from "../components/SmkImage";
 import getLedigePladser from "../lib/getLedigePladser";
 
 export default function EventSidebar({ event }) {
@@ -19,14 +20,15 @@ export default function EventSidebar({ event }) {
       </p>
 
       {event.artworkIds?.length > 0 && (
-        <div className="mt-4">
-          <img
-            src={`https://iip-thumb.smk.dk/iiif/jp2/${event.artworkIds[0].toLowerCase()}.tif.jp2/full/!400,/0/default.jpg`}
-            alt={`Artwork for ${event.title}`}
-            className="w-full h-40 object-cover rounded"
-          />
-        </div>
-      )}
+  <div className="mt-4 h-40 w-full rounded overflow-hidden">
+    <SmkImage
+      artworkId={event.artworkIds[0]}
+      alt={`Artwork for ${event.title}`}
+      width={400}
+      height={160}
+    />
+  </div>
+)}
     </aside>
   );
 }
