@@ -14,7 +14,7 @@ export default function TrendingEvents() {
       <h2>Mest Trending</h2>
       <div className="flex gap-4 overflow-x-auto pb-4">
         {trending.map((event) => (
-          <div className="min-w-[250px] flex-shrink-0" key={event.id}>
+          <div className="min-w-[250px] flex-shrink-0 h-full" key={event.id}>
             <EventCard event={event} />
           </div>
         ))}

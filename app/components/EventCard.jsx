@@ -10,7 +10,7 @@ export default function EventCard({ event }) {
   const ledigePladser = getLedigePladser(event);
 
   return (
-    <div className="w-64 flex-shrink-0">
+    <div className="w-64 flex-shrink-0 h-[280px] flex flex-col justify-between">
       <Link
         href={`/events/${event.id}`}
         className="group relative block rounded overflow-hidden"
@@ -25,13 +25,14 @@ export default function EventCard({ event }) {
 
         {/* Billede */}
         {event.artworkIds?.length > 0 && (
-          <SmkImage
-            artworkId={event.artworkIds[0]}
-            alt={`Artwork for ${event.title}`}
-            width={400}
-            height={160}
-            className="group-hover:scale-105 transition-transform duration-200"
-          />
+          <div className="relative w-full h-[160px] overflow-hidden">
+            <SmkImage
+              artworkId={event.artworkIds[0]}
+              alt={`Artwork for ${event.title}`}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-200"
+            />
+          </div>
         )}
 
         {/* Tekst */}

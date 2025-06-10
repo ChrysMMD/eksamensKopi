@@ -16,7 +16,7 @@ export default function EventDetailPage() {
   useEffect(() => {
     async function fetchEvent() {
       try {
-        const res = await axios.get(`http://localhost:8080/events/${id}`);
+        const res = await axios.get(`https://async-exhibit-server-1qfz.onrender.com/events/${id}`);
         const eventData = res.data;
 
         // Hent detaljer for hvert SMK-værk

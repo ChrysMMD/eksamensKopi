@@ -1,6 +1,6 @@
 export default function DashboardCard({ event, onEdit, onDelete }) {
   return (
-    <div className="border p-4 rounded shadow-sm">
+    <div className="border p-4 rounded shadow-sm bg-white">
       {/* Indhold */}
       <div className="flex justify-between items-start">
         <div className="space-y-2">
