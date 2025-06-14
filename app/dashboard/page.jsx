@@ -1,135 +1,56 @@
 "use client";
-
 import { useUser } from "@clerk/nextjs";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Crud from "../components/Crud";
 import Button from "../components/Button";
 import EventList from "../components/EventList";
-import api from "../lib/api";
 import DashboardCard from "../components/DashboardCard";
 import { useRouter } from "next/navigation";
+import useLoadEvents from '../lib/useLoadEvents';
+import useDeleteEvent from '../lib/useDeleteEvent';
+import useEventStore from "../stores/useEventStore";
 
 export default function DashboardPage() {
+  useLoadEvents();
   const { user } = useUser();
-  const [events, setEvents] = useState([]);
-  const [locations, setLocations] = useState([]);
-
-  const [showCrudForm, setShowCrudForm] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-
   const router = useRouter();
 
-  //hentning af locations fra backend
-  useEffect(() => {
-    const fetchLocations = async () => {
-      try {
-        const res = await api.get("/locations");
-        setLocations(res.data);
-      } catch (err) {
-        console.error("Kunne ikke hente lokationer:", err);
-      }
-    };
+  const events = useEventStore((state) => state.events);
+  const setEvents = useEventStore((state) => state.setEvents); 
+  const deleteEvent = useDeleteEvent();
 
-    fetchLocations();
-  }, []);
+  // CRUD-form state
+  const [showCrudForm, setShowCrudForm] = useState(false);
+  const [editingEvent, setEditingEvent] = useState(null);
 
-  //hentning af events fra backend
-  useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        const res = await api.get("/events");
-        setEvents(res.data);
-      } catch (err) {
-        console.error("Kunne ikke hente events:", err);
-      }
-    };
-
-    fetchEvents();
-  }, []);
-
-  //redigering
-  const handleEdit = (event) => {
-    setEditingId(event.id);
+  // Opret
+  const handleCreate = () => {
+    setEditingEvent(null);
     setShowCrudForm(true);
   };
 
-  //gem
-  const handleSave = async (formData) => {
-    const eventToSend = {
-      ...formData,
-      curator: user?.firstName || "Ukendt",
-    };
-    console.log("📦 Klar til at sende:", eventToSend);
+  // Rediger
+  const handleEdit = (event) => {
+    setEditingEvent(event);
+    setShowCrudForm(true);
+  };
 
-    const conflict = events.find((e) => {
-      const sameLocation = String(e.locationId) === String(formData.locationId);
-      const sameDate = e.date === formData.date;
-      const notSameEvent = e.id !== editingId;
+  // Annuller
+  const handleCancel = () => {
+    setShowCrudForm(false);
+    setEditingEvent(null);
+  };
 
-      return sameLocation && sameDate && notSameEvent;
-    });
-
-    if (conflict) {
-      alert("Der findes allerede et event med denne lokation og dato.");
-      return;
-    }
-
-    try {
-      let response;
-
-      if (editingId) {
-        response = await api.patch(`/events/${editingId}`, eventToSend);
-
-        // Find tilhørende lokation
-        const locationObj = locations.find(
-          (loc) => String(loc.id) === String(response.data.locationId)
-        );
-
-        setEvents((prev) =>
-          prev.map((event) =>
-            event.id === editingId
-              ? { ...response.data, location: locationObj || null }
-              : event
-          )
-        );
-      } else {
-        console.log("📦 Klar til at sende:", eventToSend);
-
-        response = await api.post("/events", eventToSend);
-        console.log("✅ Serverens svar:", response);
-        console.log("🧪 Inkluderer svar isDraft?", response.data.isDraft);
-
-        // Find tilhørende lokation
-        const locationObj = locations.find(
-          (loc) => String(loc.id) === String(response.data.locationId)
-        );
-
-        setEvents((prev) => [
-          { ...response.data, location: locationObj || null },
-          ...prev,
-        ]);
-      }
-
-      setShowCrudForm(false);
-      setEditingId(null);
-    } catch (err) {
-      if (err.response) {
-        console.error("🧨 Fejl-svar fra backend:", err.response.data);
-      } else {
-        console.error("🧨 Ingen svar, fejl i request:", err.message);
-      }
+  // Slet
+  const handleDelete = async (id) => {
+    if (confirm("Er du sikker på at du vil slette?")) {
+      await deleteEvent(id);
     }
   };
 
-  //sletning
-  const handleDelete = async (id) => {
-    try {
-      await api.delete(`/events/${id}`);
-      setEvents((prev) => prev.filter((event) => event.id !== id));
-    } catch (err) {
-      console.error("Fejl ved sletning:", err);
-      alert("Noget gik galt ved sletning. Se konsollen.");
-    }
+  // Gem
+  const handleSave = (savedEvent) => {
+    handleCancel();
   };
 
   return (
@@ -137,16 +58,15 @@ export default function DashboardPage() {
       <h1 className="mb-3">Velkommen {user?.firstName || "bruger"}</h1>
 
       <div className="flex flex-rows gap-10">
-
         <Button
           variant="secondary"
           className="mb-4"
-          onClick={() => setShowCrudForm(!showCrudForm)}
+          onClick={handleCreate}
         >
-          {showCrudForm ? "Luk formular" : "Opret nyt event"}
+          Opret nyt event
         </Button>
 
-         <Button
+        <Button
           variant="secondary"
           className="mb-4"
           onClick={() => router.push('/events')}
@@ -158,12 +78,9 @@ export default function DashboardPage() {
       {showCrudForm && (
         <Crud
           existingEvents={events}
-          initialData={events.find((e) => e.id === editingId)}
+          initialData={editingEvent}
           onSave={handleSave}
-          onCancel={() => {
-            setShowCrudForm(false);
-            setEditingId(null);
-          }}
+          onCancel={handleCancel}
         />
       )}
 
@@ -176,12 +93,11 @@ export default function DashboardPage() {
               <DashboardCard
                 event={event}
                 onEdit={() => handleEdit(event)}
-                onDelete={handleDelete}
+                onDelete={() => handleDelete(event.id)}
               />
             )}
           />
         </div>
-
         <div>
           <h2>Kladder</h2>
           <EventList
@@ -190,7 +106,7 @@ export default function DashboardPage() {
               <DashboardCard
                 event={event}
                 onEdit={() => handleEdit(event)}
-                onDelete={handleDelete}
+                onDelete={() => handleDelete(event.id)}
               />
             )}
           />
