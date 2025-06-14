@@ -4,7 +4,8 @@ const nextConfig = {
   output: 'standalone',
   images: {
     domains: [
-      "iip-thumb.smk.dk",     
+      "iip-thumb.smk.dk",
+      'iip.smk.dk',     
       "www.smk.dk",           
       "api.smk.dk",           
       "iiif-snapshot.smk.dk"  

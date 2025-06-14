@@ -91,32 +91,30 @@ export default async function VaerkDetalje({ params }) {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {lignende.map((item) => {
               const title = item.titles?.[0]?.title || "Ukendt titel";
+              const hasImage = item.image_iiif_id || item.image_thumbnail;
+
 
               return (
-                <Link
-                  href={`/art/${item.object_number}`}
-                  key={item.object_number}
-                >
-                  <div className="aspect-[4/3] w-full overflow-hidden rounded shadow">
-                    {thumb ? (
-                      <SmkImage
-                        iiifId={vaerk.image_iiif_id}
-                        fallback={vaerk.image_thumbnail}
-                        alt={vaerk.titles?.[0]?.title || "Ukendt titel"}
-                        width={600}
-                        height={450}
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                        <span className="text-xs text-gray-500 text-center px-2">
-                          Intet billede
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  <p className="text-sm mt-1">{title}</p>
-                </Link>
+                <Link href={`/art/${item.object_number}`} key={item.object_number}>
+      <div className="aspect-[4/3] w-full overflow-hidden rounded shadow">
+        {hasImage ? (
+          <SmkImage
+            iiifId={item.image_iiif_id}
+            fallback={item.image_thumbnail}
+            alt={title}
+            width={600}
+            height={450}
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+            <span className="text-xs text-gray-500 text-center px-2">
+              Intet billede
+            </span>
+          </div>
+        )}
+      </div>
+      <p className="text-sm mt-1">{title}</p>
+    </Link>
               );
             })}
           </div>
