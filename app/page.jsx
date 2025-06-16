@@ -10,7 +10,7 @@ export default function Home() {
 
   return (
     <main
-      className="max-h-screen flex items-center justify-center text-white"
+      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-10 flex items-center justify-center text-white max-w-3xl"
     >
 
       {/* Content */}
