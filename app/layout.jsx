@@ -8,6 +8,9 @@ import {
   SignedOut,
   UserButton,
 } from '@clerk/nextjs'
+import PageWrapper from "./components/PageWrapper";
+
+
 
 const inter = Inter({
   subsets: ["latin"],
@@ -22,6 +25,8 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+
+
   return (
     <ClerkProvider
       signInUrl="/signin"
@@ -30,7 +35,12 @@ export default function RootLayout({ children }) {
       telemetry={false}
     >
       <html lang="da">
-        <body className={inter.variable}>{children}</body>
+        
+        <body className={inter.variable}>
+          <PageWrapper>
+          {children}
+          </PageWrapper>
+          </body>
       </html>
     </ClerkProvider>
   );

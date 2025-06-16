@@ -4,6 +4,7 @@ import { format, addMonths } from 'date-fns'
 import useEventStore from '../stores/useEventStore'
 import EventCard from './EventCard'
 import Button from './Button'
+import {da} from 'date-fns/locale'
 
 export default function DiscoverEvents() {
   const events = useEventStore((state) => state.events)
@@ -11,13 +12,13 @@ export default function DiscoverEvents() {
 
   //Generer næste 4 mdr
   const months = Array.from({ length: 4 }).map((_, i) =>
-    format(addMonths(new Date(), i), 'MMMM yyyy')
+    format(addMonths(new Date(), i), 'MMMM yyyy', {locale: da})
   )
 
   const visibleEvents = selectedMonth
     ? events.filter(
         (event) =>
-          format(new Date(event.date), 'MMMM yyyy') === selectedMonth
+          format(new Date(event.date), 'MMMM yyyy', { locale: da }) === selectedMonth
       )
     : events
 

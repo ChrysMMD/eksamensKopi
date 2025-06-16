@@ -39,6 +39,7 @@ body {
   background: #ededed ;
   font-family: var(--font-body);
   padding: 1rem;
+  height: 100vh;
 }
 
 /* Taget fra ChatGPT */
@@ -55,6 +56,17 @@ body {
 
   .font-h1        { font-family: var(--font-h1); }
   .font-body      { font-family: var(--font-body); }
+
+  
+
+  .bg-hero {
+    background-image: url('https://iip-thumb.smk.dk/iiif/jp2/4b29bb21t_kksgb22213.tif.jp2/full/!1024,/0/default.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100%;
+    width: auto;
+  }
 }
 
 @layer base {
