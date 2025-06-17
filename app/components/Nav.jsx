@@ -15,7 +15,7 @@ export default function Nav() {
 
 
   return (
-    <nav className="flex p-2 justify-between items-center z-10">
+    <nav className="flex p-2 justify-between items-center z-10 mb-10">
       <Link href="/">
         <Image src={logoSrc} alt="Logo" width={70} height={40} priority />
       </Link>

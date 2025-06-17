@@ -22,7 +22,7 @@ export default function EventPage() {
 
   return (
     <div>
-      <h1 className="font-h1 text-4xl mb-3">Kommende arrangementer</h1>
+      <h1 className="font-h1 text-4xl mb-0">Kommende arrangementer</h1>
 
       {loading ? (
         <div className="flex justify-center items-center h-80">

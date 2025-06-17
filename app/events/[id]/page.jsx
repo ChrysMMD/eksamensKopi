@@ -6,6 +6,7 @@ import axios from "axios";
 import getLedigePladser from "../../lib/getLedigePladser";
 import Button from "../../components/Button";
 import Link from "next/link";
+import { getEvent } from "../../lib/eventApi";
 
 export default function EventDetailPage() {
   const { id } = useParams();
@@ -16,8 +17,7 @@ export default function EventDetailPage() {
   useEffect(() => {
     async function fetchEvent() {
       try {
-        const res = await axios.get(`https://async-exhibit-server-1qfz.onrender.com/events/${id}`);
-        const eventData = res.data;
+        const eventData = await getEvent(id);
 
         // Hent detaljer for hvert SMK-værk
         const artworkPromises = eventData.artworkIds?.map(async (artId) => {
@@ -46,7 +46,7 @@ export default function EventDetailPage() {
   const ledigePladser = getLedigePladser(event);
 
   return (
-    <div className="p-6 max-w-3xl mx-auto border border-[var(--color-orange)]">
+    <div className="p-6 max-w-3xl mx-auto border border-[var(--color-orange)] bg-gray-50 ">
       {/* Tilbage-knap */}
       <Link
         href="/events"
