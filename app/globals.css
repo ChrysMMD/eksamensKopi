@@ -60,7 +60,7 @@ body {
   
 
   .bg-hero {
-    background-image: url('https://iip-thumb.smk.dk/iiif/jp2/4b29bb21t_kksgb22213.tif.jp2/full/!1024,/0/default.jpg');
+    background-image: url('/4b29bb21t_kksgb22213.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
