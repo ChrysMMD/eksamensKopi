@@ -7,10 +7,15 @@ import Galleri from "./Galleri";
 import useImageStore from "../stores/useImageStore";
 import useLocations from "../lib/useLocation";
 import useDates from "../lib/useDates";
-import useCreateEvent from '../lib/useCreateEvent';
-import useUpdateEvent from '../lib/useUpdateEvent';
+import useCreateEvent from "../lib/useCreateEvent";
+import useUpdateEvent from "../lib/useUpdateEvent";
 
-export default function Crud({ onSave, onCancel, initialData, existingEvents }) {
+export default function Crud({
+  onSave,
+  onCancel,
+  initialData,
+  existingEvents,
+}) {
   const {
     register,
     handleSubmit,
@@ -20,14 +25,22 @@ export default function Crud({ onSave, onCancel, initialData, existingEvents }) 
     watch,
   } = useForm({ mode: "onBlur" });
 
-  const { locations, loading: loadingLocations, error: locationsError } = useLocations();
-  const { dates: validDates, loading: loadingDates, error: datesError } = useDates();
+  const {
+    locations,
+    loading: loadingLocations,
+    error: locationsError,
+  } = useLocations();
+  const {
+    dates: validDates,
+    loading: loadingDates,
+    error: datesError,
+  } = useDates();
 
   const selectedImages = useImageStore((state) => state.selectedImages);
   const watchDate = watch("date");
   const watchLocationId = watch("locationId");
 
-    // Vælg create eller update baseret på initialData
+  // Vælg create eller update baseret på initialData
   const createEvent = useCreateEvent();
   const updateEvent = useUpdateEvent();
 
@@ -41,7 +54,7 @@ export default function Crud({ onSave, onCancel, initialData, existingEvents }) 
     }
   }, [initialData, setValue]);
 
-// Konflikt-tjek
+  // Konflikt-tjek
   const [conflictError, setConflictError] = useState("");
   useEffect(() => {
     if (watchDate && watchLocationId) {
@@ -72,33 +85,37 @@ export default function Crud({ onSave, onCancel, initialData, existingEvents }) 
 
     if (conflictError) return;
     try {
-      if (initialData){
+      if (initialData) {
         await updateEvent({
-           ...initialData,
+          ...initialData,
           ...data,
           locationId: data.locationId,
           artworkIds: selectedImages,
         });
       } else {
-      await createEvent({
-        ...data,
-        locationId: data.locationId,
-        artworkIds: selectedImages,
-      });
-    }
-    onCancel();
+        await createEvent({
+          ...data,
+          locationId: data.locationId,
+          artworkIds: selectedImages
+            .map((url) => {
+              const match = url.match(/\/jp2\/([^/]+)\/full/i);
+              return match ? match[1] : null;
+            })
+            .filter(Boolean),
+        });
+      }
+      onCancel();
     } catch (err) {
       alert("Fejl ved gemning af event!");
     }
   };
-
 
   return (
     <form
       className="space-y-6 bg-white p-6 rounded-xl shadow-md"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div> 
+      <div>
         <label htmlFor="title" className="font-semibold">
           Titel:
         </label>
@@ -112,7 +129,7 @@ export default function Crud({ onSave, onCancel, initialData, existingEvents }) 
           <span className="text-red-500">{errors.title.message}</span>
         )}
       </div>
-     
+
       <div>
         <label htmlFor="description" className="font-semibold">
           Beskrivelse:
@@ -149,7 +166,9 @@ export default function Crud({ onSave, onCancel, initialData, existingEvents }) 
         {errors.date && (
           <span className="text-red-500">{errors.date.message}</span>
         )}
-        {datesError && <span className="text-red-500">Fejl: Kan ikke hente datoer.</span>}
+        {datesError && (
+          <span className="text-red-500">Fejl: Kan ikke hente datoer.</span>
+        )}
       </div>
       <div>
         <label htmlFor="locationId" className="font-semibold">
@@ -174,7 +193,9 @@ export default function Crud({ onSave, onCancel, initialData, existingEvents }) 
         {errors.locationId && (
           <span className="text-red-500">{errors.locationId.message}</span>
         )}
-        {locationsError && <span className="text-red-500">Fejl: Kan ikke hente lokationer.</span>}
+        {locationsError && (
+          <span className="text-red-500">Fejl: Kan ikke hente lokationer.</span>
+        )}
       </div>
       <div>
         <label className="font-semibold">Galleri:</label>
