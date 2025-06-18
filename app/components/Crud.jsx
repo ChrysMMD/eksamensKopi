@@ -68,20 +68,22 @@ export default function Crud({ onSave, onCancel, initialData, existingEvents }) 
   }, [selectedImages, setValue]);
 
   const onSubmit = async (data) => {
+    console.log("Alle locations:", locations);
+
     if (conflictError) return;
     try {
       if (initialData){
         await updateEvent({
            ...initialData,
           ...data,
-          locationId: Number(data.locationId),
-          images: selectedImages,
+          locationId: data.locationId,
+          artworkIds: selectedImages,
         });
       } else {
       await createEvent({
         ...data,
-        locationId: Number(data.locationId),
-        images: selectedImages,
+        locationId: data.locationId,
+        artworkIds: selectedImages,
       });
     }
     onCancel();

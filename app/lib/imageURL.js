@@ -19,3 +19,5 @@ export function getArtworkImageUrl(artworkId, size = 400) {
   const lower = artworkId.toLowerCase();
   return `https://iip-thumb.smk.dk/iiif/jp2/${lower}.tif.jp2/full/!${size},/0/default.jpg`;
 }
+
+
